@@ -579,18 +579,19 @@ font-weight: bold;
 /* Style for the center dots */
 .center-dots {
     position: absolute;
-    top: 82%;
-    font-size: 1.5rem;
+    top: 87%;
+    font-size: 0.5rem;
     color: #0b08c5;
     display: flex;
     gap: 10px;
     background-color: white;
-    border-radius:  20px;
-    height: 5%;
-    width: 5%;
+    border-radius: 20px;
+    height: 3%;
+    width: 3%;
     justify-content: space-evenly;
     align-items: center;
 }
+
 .center-dots i {
   pointer-events: none;
 }
