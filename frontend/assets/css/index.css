@@ -27,7 +27,7 @@ font-family: 'Montserrat', Helvetica, sans-serif;
 .floating-nav {
   position: fixed;
   top: 60px;
-  left :730px;
+  left :540px;
   transform: translateX(-50%);
   z-index: 1000;
   width: auto;
@@ -188,9 +188,14 @@ font-family: 'Montserrat', Helvetica, sans-serif;
   z-index: 1;
 }
 
+#page1 .image img {
+    width: 197vh;
+    height: 74vh;
+}
+
 .image img {
-    width: 180vh;
-    height: 71vh;
+    width: 104vh;
+    height: 65vh;
 }
 
 /* Blob Styling */
@@ -348,8 +353,8 @@ font-weight: bold;
 /* lemon Styling SLIDE 2 */
 .lemon1-image {
     position: absolute;
-    top: -12%;
-    left: 13%;
+    top: -22%;
+    left: 20%;
     width: 530PX;
     height: auto;
     transform: rotate(163deg) SCALEY(-1);
@@ -798,7 +803,7 @@ font-weight: bold;
 
 #page3 .M4-image {
     position: absolute;
-    top: 72%;
+    top: 66%;
     left: -3%;
     width: 460PX;
     height: auto;
@@ -814,11 +819,11 @@ font-weight: bold;
 }
 #page3 .M3-image {
     position: absolute;
-    top: 74%;
-    left: 17%;
+    top: 66%;
+    left: 26%;
     width: 503PX;
     height: auto;
-    transform: rotate(255deg);
+    transform: rotate(266deg);
     z-index: 1;
     pointer-events: none;
 }
@@ -829,13 +834,63 @@ font-weight: bold;
     width: 75%;
     height: 35%;
 }
+.device-content {
+  padding: 20px;
+  text-align: center;
+}
 
+.device-content h1 {
+  font-size: 24px;
+  color: #ffffff;
+  margin-bottom: 10px;
+}
 
+.device-content hr {
+  border: none;
+  border-bottom: 2px solid #3c60ff;
+  margin-bottom: 20px;
+  width: 50%;
+  margin-left: auto;
+  margin-right: auto;
+}
 
+.device-content .image-container {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+  overflow-x: auto;
+  padding-bottom: 20px;
+  scroll-behavior: smooth;
+}
 
+.device-content .image-box p {
+  margin-top: 15px;
+  font-size: 16px;
+  color: #ffffff;
+}
 
+.device-content .image-box img {
+  max-width: 100px;
+  height: 133px;
+  border-radius: 12px;
+  padding: 10px;
+  background: #fafafab2;
+}
 
+.device-content .image-box:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 20px 30px rgb(0 0 0 / 0.20);
+  border: 1px solid #fafafab2;
+}
 
+.device-content .image-box:hover p {
+  color: #2b6be2;
+}
+
+.device-content .image-box:hover img {
+  border-color: #493cff;
+  background: #fafafab2;
+}
 
 
 
