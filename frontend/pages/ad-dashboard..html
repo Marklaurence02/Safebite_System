@@ -1,0 +1,852 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard</title>
+  <link rel="stylesheet" href="../assets/css/Admin-assets/sidebar.css">
+  <link rel="stylesheet" href="../assets/css/Admin-assets/dashboard.css">
+  <link rel="stylesheet" href="../assets/css/Admin-assets/analyticstat.css">
+  <link rel="stylesheet" href="../assets/css/Admin-assets/ad-chart.css">
+  <link rel="stylesheet" href="../assets/css/Admin-assets/spoilageReport.css">
+  <link rel="stylesheet" href="../assets/css/Admin-assets/report-generator.css">
+  <link rel="stylesheet" href="../assets/css/Admin-assets/user.css">
+  <link rel="stylesheet" href="../assets/css/Admin-assets/feedbacks.css">
+  <link rel="stylesheet" href="../assets/css/Admin-assets/account-modal.css">
+  <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+  <script src="https://unpkg.com/jspdf-autotable@latest/dist/jspdf.plugin.autotable.js"></script>
+  <script>
+    // Fallback if unpkg fails
+    if (typeof window.jspdf === 'undefined') {
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"><\/script>');
+      document.write('<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.29/jspdf.plugin.autotable.min.js"><\/script>');
+    }
+  </script>
+</head>
+<body>
+<aside class="sidebar expanded" id="sidebar">
+  <div class="sidebar-header">
+    <span class="sidebar-logo" id="sidebarLogo" style="cursor:pointer;">&#128230;</span>
+    <span class="sidebar-title">Admin</span>
+  </div>
+  <nav class="sidebar-nav">
+    <ul>
+      <li class="nav-item active">
+        <a href="#" class="nav-link" data-page="dashboard" style="display:flex;align-items:center;gap:16px;color:inherit;text-decoration:none;width:100%">
+          <span class="nav-icon">&#8962;</span>
+          <span class="nav-text">Dashboard</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link" data-page="analytics-summary" style="display:flex;align-items:center;gap:16px;color:inherit;text-decoration:none;width:100%">
+          <span class="nav-icon">&#128200;</span>
+          <span class="nav-text">Sensor Analytics</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link" data-page="report-generator" style="display:flex;align-items:center;gap:16px;color:inherit;text-decoration:none;width:100%">
+          <span class="nav-icon">&#128229;</span>
+          <span class="nav-text">Reports Generator</span>
+        </a>
+      </li>
+    </ul>
+    <hr class="sidebar-divider">
+    <ul>
+      <li class="nav-item">
+        <a href="#" class="nav-link" data-page="users" style="display:flex;align-items:center;gap:16px;color:inherit;text-decoration:none;width:100%">
+          <span class="nav-icon">&#128101;</span>
+          <span class="nav-text">Users</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link" data-page="user-activity-log" style="display:flex;align-items:center;gap:16px;color:inherit;text-decoration:none;width:100%">
+          <span class="nav-icon">&#128221;</span>
+          <span class="nav-text">All User Activity Log</span>
+        </a>
+      </li>
+      <li class="nav-item">
+        <a href="#" class="nav-link" data-page="admin-log" style="display:flex;align-items:center;gap:16px;color:inherit;text-decoration:none;width:100%">
+          <span class="nav-icon">&#128273;</span>
+          <span class="nav-text">Admin Logs / History</span>
+        </a>
+      </li>
+    </ul>
+    <hr class="sidebar-divider">
+    <ul>
+      <li class="nav-item">
+        <a href="#" class="nav-link" data-page="feedbacks" style="display:flex;align-items:center;gap:16px;color:inherit;text-decoration:none;width:100%">
+          <span class="nav-icon">&#128172;</span>
+          <span class="nav-text">Feedbacks/ Support Tickets</span>
+        </a>
+      </li>
+  </ul>
+</nav>
+  <div class="sidebar-account" id="sidebarAccountBtn">
+    <span class="account-icon">&#128100;</span>
+    <span class="account-text">Account</span>
+    <button class="logout-btn" id="logoutBtn" type="button" style="background:none;border:none;color:#666;cursor:pointer;margin-left:auto;font-size:12px;">Logout</button>
+  </div>
+</aside>
+<main id="main-content">
+  <!-- Content will be loaded here by spa.js -->
+</main>
+
+<template id="dashboard-template">
+    <div class="dashboard-container">
+        <div class="dashboard-row">
+          <div class="dashboard-card sensors-card">
+            <div class="sensors-header">
+              <h4>Dashboard</h4>
+              <div class="sensors-select">
+                <label for="calendar-input">Select Date:</label>
+                <div class="calendar-container">
+                  <input type="date" id="calendar-input" class="dashboard-date-input" placeholder="Select a date">
+                </div>
+              </div>
+            </div>
+            <div class="stat-cards-container">
+              <div class="stat-card">
+                <div class="stat-card-header">
+                  <div class="stat-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                  </div>
+                  <div class="stat-info">
+                    <div class="stat-value">142</div>
+                    <div class="stat-label">Active Users</div>
+                  </div>
+                </div>
+                <div class="stat-chart">
+                  <canvas id="userChart"></canvas>
+                </div>
+              </div>
+              <div class="stat-card highlight">
+                <div class="stat-card-header">
+                  <div class="stat-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21.75 8a.75.75 0 00-.75-.75h-2.25a.75.75 0 000 1.5h2.25a.75.75 0 00.75-.75z"/><path d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/><path fill-rule="evenodd" d="M12 2.25c-5.385 0-9.75 4.365-9.75 9.75s4.365 9.75 9.75 9.75 9.75-4.365 9.75-9.75S17.385 2.25 12 2.25zM3.75 12a8.25 8.25 0 1116.5 0 8.25 8.25 0 01-16.5 0z"/></svg>
+                  </div>
+                  <div class="stat-info">
+                    <div class="stat-value">89</div>
+                    <div class="stat-label">Device Reports</div>
+                  </div>
+                </div>
+                <div class="stat-chart">
+                  <canvas id="deviceChart"></canvas>
+                </div>
+              </div>
+              <div class="stat-card">
+                <div class="stat-card-header">
+                  <div class="stat-icon">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                  </div>
+                  <div class="stat-info">
+                    <div class="stat-value">31</div>
+                    <div class="stat-label">Spoilage alerts triggered</div>
+                  </div>
+                </div>
+                <div class="stat-chart">
+                  <canvas id="alertChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="dashboard-row">
+          <div class="dashboard-card tall activity-card" style="flex:2;">
+            <div class="activity-header">
+              <span class="activity-title">Device Activity</span>
+              <select class="activity-filter">
+                <option>N/A</option>
+                <option>Daily</option>
+                <option>Weekly</option>
+                <option>Monthly</option>
+              </select>
+            </div>
+            <canvas id="activityChart"></canvas>
+          </div>
+          <div class="dashboard-card tall" style="flex:1;">
+            <h4>Recent Reviews</h4>
+          </div>
+        </div>
+      </div>
+</template>
+
+<!-- Sensor Analytics Summary -->
+<template id="analytics-summary-template">
+  <div class="spoilage-main">
+    <div class="spoilage-header-top">
+      <div>
+        <h1>Sensor Analytics</h1>
+        <div class="spoilage-subtitle">Monitor portable food spoilage sensors used by food testers</div>
+      </div>
+      <div class="spoilage-header-buttons">
+        <a href="#" class="spoilage-btn active" data-page="analytics-summary">Summary</a>
+        <a href="#" class="spoilage-btn" data-page="analytics-detail">Detailed View</a>
+      </div>
+    </div>
+    <div class="spoilage-stats-row">
+      <div class="spoilage-stat-card"><div class="stat-icon stat-blue">&#128230;</div><div class="stat-label">Total Sensors</div><div class="stat-value">156</div></div>
+      <div class="spoilage-stat-card"><div class="stat-icon stat-green">&#10003;</div><div class="stat-label">Active Testers</div><div class="stat-value">142</div></div>
+      <div class="spoilage-stat-card"><div class="stat-icon stat-red">&#10060;</div><div class="stat-label">Spoilage Alert</div><div class="stat-value">6</div></div>
+      <div class="spoilage-stat-card"><div class="stat-icon stat-gray">&#9200;</div><div class="stat-label">Inactive</div><div class="stat-value">12</div></div>
+    </div>
+    <div class="spoilage-main-cards">
+      <div class="spoilage-card spoilage-bar-card">
+        <div class="spoilage-card-title">Sensor Usage by Tester Type</div>
+        <div class="spoilage-bar-list">
+          <div class="spoilage-bar-row"><span class="bar-label">Street Food Testers</span><div class="bar-bg"><div class="bar-fill bar-red" style="width:65%"></div></div><span class="bar-value">65%</span></div>
+          <div class="spoilage-bar-row"><span class="bar-label">Food Truck Inspectors</span><div class="bar-bg"><div class="bar-fill bar-red" style="width:25%"></div></div><span class="bar-value">25%</span></div>
+          <div class="spoilage-bar-row"><span class="bar-label">Canteen Auditors</span><div class="bar-bg"><div class="bar-fill" style="width:10%"></div></div><span class="bar-value">10%</span></div>
+        </div>
+      </div>
+      <div class="spoilage-card spoilage-summary-card">
+        <div class="spoilage-card-title">Sensor Activity Summary</div>
+        <div class="spoilage-summary-list">
+          <div class="summary-row"><span class="summary-label">MQ4 Sensors</span><span class="summary-desc">98 food testers actively using</span><span class="summary-rate bar-red">81.7%</span></div>
+          <div class="summary-row"><span class="summary-label">DHT11 Sensors</span><span class="summary-desc">32 food testers actively using</span><span class="summary-rate">88.9%</span></div>
+          <div class="summary-row"><span class="summary-label">DS18B20 Sensors</span><span class="summary-desc">12 food testers actively using</span><span class="summary-rate">100%</span></div>
+        </div>
+        <div class="summary-total">Total Overview: <span class="summary-total-right">142 food testers actively using sensors</span></div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!--Detailed-report-->
+<template id="analytics-detail-template">
+  <div class="spoilage-main">
+    <div class="spoilage-header-top">
+      <div>
+        <h1>Sensor Analytics</h1>
+        <div class="spoilage-subtitle">Monitor portable food spoilage sensors used by food testers</div>
+      </div>
+      <div class="spoilage-header-buttons">
+        <a href="#" class="spoilage-btn" data-page="analytics-summary">Summary</a>
+        <a href="#" class="spoilage-btn active" data-page="analytics-detail">Detailed View</a>
+      </div>
+    </div>
+    <div class="detailed-report-card">
+      <div class="detailed-report-filters">
+        <div class="filter-row">
+          <div class="filter-group">
+            <label>Name Search</label>
+            <input type="text" id="nameSearch" placeholder="Search food tester name..." />
+          </div>
+          <div class="filter-group">
+            <label>Start Date</label>
+            <input type="date" id="startDate" />
+          </div>
+          <div class="filter-group">
+            <label>End Date</label>
+            <input type="date" id="endDate" />
+          </div>
+          <div class="filter-group">
+            <label>Tester Type</label>
+            <select id="testerType"><option>All Types</option><option>Street Food Tester</option><option>Food Truck Inspector</option><option>Canteen Auditor</option></select>
+          </div>
+          <div class="filter-group">
+            <label>Sensor Type</label>
+            <select id="sensorType"><option>All Types</option><option>MQ4</option><option>DHT11</option><option>DS18B20</option></select>
+          </div>
+          <div class="filter-group">
+            <label>Status</label>
+            <select id="status"><option>All Status</option><option>Active</option><option>Spoilage Alert</option><option>Inactive</option></select>
+          </div>
+        </div>
+        <div class="filter-actions">
+          <button class="filter-btn" id="clearFilters">Clear Filters</button>
+          <button class="filter-btn export" id="exportCSV">Export CSV</button>
+          <button class="filter-btn export" id="exportPDF">Export PDF</button>
+        </div>
+      </div>
+      <div class="detailed-report-table-card">
+        <div class="detailed-report-title">Detailed Sensor Report (<span id="sensorCount">156</span> sensors)</div>
+        <table class="detailed-report-table">
+          <thead>
+            <tr>
+              <th>FOOD TESTER</th>
+              <th>TYPE</th>
+              <th>STATUS</th>
+              <th>LAST PING</th>
+              <th>LAST READING</th>
+              <th>ALERTS TODAY</th>
+            </tr>
+          </thead>
+          <tbody id="sensorTableBody">
+            <tr>
+              <td>Juan's Tacos Cart<br><span class="created-date">Registered: 6/25/2025</span></td>
+              <td><span class="cat-badge">Street Food Tester</span></td>
+              <td><span class="status-badge spoiled">Spoilage Alert</span></td>
+              <td>6/26/2025<br><span class="expiry-today">2 mins ago</span></td>
+              <td>Gas: 380 ppm</td>
+              <td><span class="alert-badge">3 alerts</span></td>
+            </tr>
+            <tr>
+              <td>Maria's Food Truck<br><span class="created-date">Registered: 6/22/2025</span></td>
+              <td><span class="cat-badge">Food Truck Inspector</span></td>
+              <td><span class="status-badge expired">Inactive</span></td>
+              <td>6/25/2025<br><span class="expiry-expired">1 day ago</span></td>
+              <td>Temp: 4.2°C, Hum: 78%</td>
+              <td><span class="alert-badge none">0 alerts</span></td>
+            </tr>
+            <tr>
+              <td>School Canteen #3<br><span class="created-date">Registered: 6/25/2025</span></td>
+              <td><span class="cat-badge">Canteen Auditor</span></td>
+              <td><span class="status-badge">Active</span></td>
+              <td>6/26/2025<br><span class="expiry-today">5 mins ago</span></td>
+              <td>Temp: -1.8°C</td>
+              <td><span class="alert-badge">1 alert</span></td>
+            </tr>
+            <tr>
+              <td>Carlos BBQ Cart<br><span class="created-date">Registered: 6/25/2025</span></td>
+              <td><span class="cat-badge">Street Food Tester</span></td>
+              <td><span class="status-badge">Active</span></td>
+              <td>6/30/2025<br><span class="expiry-days">1 min ago</span></td>
+              <td>Gas: 220 ppm</td>
+              <td><span class="alert-badge">2 alerts</span></td>
+            </tr>
+            <tr>
+              <td>Office Canteen A<br><span class="created-date">Registered: 6/24/2025</span></td>
+              <td><span class="cat-badge">Canteen Auditor</span></td>
+              <td><span class="status-badge spoiled">Spoilage Alert</span></td>
+              <td>6/26/2025<br><span class="expiry-today">3 mins ago</span></td>
+              <td>Temp: 25.3°C, Hum: 89%</td>
+              <td><span class="alert-badge">4 alerts</span></td>
+            </tr>
+            <tr>
+              <td>Beach Food Truck #2<br><span class="created-date">Registered: 6/23/2025</span></td>
+              <td><span class="cat-badge">Food Truck Inspector</span></td>
+              <td><span class="status-badge">Active</span></td>
+              <td>6/26/2025<br><span class="expiry-today">1 min ago</span></td>
+              <td>Temp: 3.8°C</td>
+              <td><span class="alert-badge">0 alerts</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</template>
+
+<!-- Report Generator -->
+<template id="report-generator-template">
+  <div class="spoilage-main">
+    <div class="spoilage-header-top">
+      <div>
+        <h1>Report Generator</h1>
+        <div class="spoilage-subtitle">Select a report type and date range to generate and download data.</div>
+      </div>
+    </div>
+    <div class="report-generator-card">
+      <div class="report-filters">
+        <div class="filter-controls">
+            <div class="filter-group">
+                <label for="reportType">Report Type</label>
+                <select id="reportType">
+                    <option value="new_users">New User Count</option>
+                    <option value="top_spoiling_food">Top Spoiling Foods</option>
+                    <option value="most_used_sensor">Most Used Sensors</option>
+                </select>
+            </div>
+            <div class="filter-group">
+                <label for="reportDateRange">Date Range</label>
+                <select id="reportDateRange">
+                    <option>Daily</option>
+                    <option>Weekly</option>
+                    <option>Monthly</option>
+                    <option>Custom</option>
+                </select>
+            </div>
+             <div class="filter-group filter-group-custom-date" style="display:none;">
+                <label for="reportStartDate">Start Date</label>
+                <input type="date" id="reportStartDate" />
+            </div>
+            <div class="filter-group filter-group-custom-date" style="display:none;">
+                <label for="reportEndDate">End Date</label>
+                <input type="date" id="reportEndDate" />
+            </div>
+        </div>
+        <div class="filter-actions">
+            <button class="filter-btn" id="generateReport">Generate Report</button>
+            <button class="filter-btn export" id="exportReportCSV">Download Excel</button>
+            <button class="filter-btn export" id="exportReportPDF">Download PDF</button>
+        </div>
+      </div>
+      <div class="report-preview-area">
+        <div class="report-preview-title">Report Preview</div>
+        <div id="report-preview-content">
+          <p style="text-align: center; padding: 40px; color: #888;">Your generated report will be displayed here. Use the filters above to generate a new report.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</template>
+
+
+<!-- User  -->
+<template id="users-template">
+  <div class="spoilage-main">
+    <div class="spoilage-header-top">
+      <div>
+        <h1>Users</h1>
+        <div class="spoilage-subtitle">Manage clients who use your devices: create, edit, or delete accounts</div>
+      </div>
+    </div>
+    <div class="user-card">
+      <div class="user-filters">
+        <div class="filter-controls">
+          <div class="filter-group">
+            <label for="userSearch">Search</label>
+            <input type="text" id="userSearch" class="user-search-input" placeholder="Search by name or email..." />
+          </div>
+          <div class="filter-group">
+            <label for="userStatusFilter">Status</label>
+            <select id="userStatusFilter" class="user-filter-select">
+              <option value="">All Status</option>
+              <option value="Active">Active</option>
+              <option value="Inactive">Inactive</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="userDateStart">Start Date</label>
+            <input type="date" id="userDateStart" class="user-filter-date" />
+          </div>
+          <div class="filter-group">
+            <label for="userDateEnd">End Date</label>
+            <input type="date" id="userDateEnd" class="user-filter-date" />
+          </div>
+        </div>
+        <div class="filter-actions">
+          <button class="filter-btn" id="addUserBtn">+ Add User</button>
+        </div>
+      </div>
+      <div class="report-preview-area">
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Email</th>
+              <th>Date Created</th>
+              <th>Status</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody id="userTableBody">
+            <!-- User rows will be rendered here by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <!-- User Modal -->
+    <div class="user-modal" id="userModal" style="display:none;">
+      <div class="user-modal-content">
+        <h2 id="userModalTitle">Add User</h2>
+        <form id="userForm">
+          <input type="hidden" id="userId" />
+          <div class="form-group">
+            <label for="userName">Name</label>
+            <input type="text" id="userName" required />
+          </div>
+          <div class="form-group">
+            <label for="userEmail">Email</label>
+            <input type="email" id="userEmail" required />
+          </div>
+          <div class="form-group">
+            <label for="userStatus">Status</label>
+            <select id="userStatus">
+              <option>Active</option>
+              <option>Inactive</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>Date Created</label>
+            <input type="text" id="userDateCreated" readonly style="background:#181f36;color:#bfc9da;" />
+          </div>
+          <div class="form-group password-group" style="display:none;">
+            <label for="userCurrentPassword" id="userCurrentPasswordLabel" style="display:none;">Current Password</label>
+            <div style="position:relative;display:flex;align-items:center;">
+              <input type="password" id="userCurrentPassword" readonly style="display:none;background:#181f36;color:#bfc9da;" tabindex="-1" />
+              <button type="button" id="toggleCurrentUserPassword" style="position:absolute;right:10px;background:none;border:none;cursor:pointer;padding:0 6px;color:#bfc9da;display:none;" tabindex="-1" aria-label="Show current password">
+                <span id="toggleCurrentUserPasswordIcon">&#128065;</span>
+              </button>
+            </div>
+          </div>
+          <div class="form-group password-group" style="display:none;">
+            <label for="userPassword">New Password</label>
+            <div style="position:relative;display:flex;align-items:center;">
+              <input type="password" id="userPassword" autocomplete="new-password" minlength="6" placeholder="Enter new password... (leave blank to keep current)" style="flex:1;" />
+              <button type="button" id="toggleUserPassword" style="position:absolute;right:10px;background:none;border:none;cursor:pointer;padding:0 6px;color:#bfc9da;" tabindex="-1" aria-label="Show password">
+                <span id="toggleUserPasswordIcon">&#128065;</span>
+              </button>
+            </div>
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="filter-btn">Save</button>
+            <button type="button" class="filter-btn export" id="cancelUserBtn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+    <!-- Admin Password Modal -->
+    <div class="user-modal" id="adminPassModal" style="display:none;z-index:2000;">
+      <div class="user-modal-content">
+        <h2>Admin Password Required</h2>
+        <form id="adminPassForm">
+          <div class="form-group">
+            <label for="adminPassInput">Enter Admin Password</label>
+            <input type="password" id="adminPassInput" required autocomplete="current-password" />
+          </div>
+          <div class="modal-actions">
+            <button type="submit" class="filter-btn">Confirm</button>
+            <button type="button" class="filter-btn export" id="cancelAdminPassBtn">Cancel</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</template>
+
+    <!-- user ctivvity log -->
+<template id="user-activity-log-template">
+  <div class="spoilage-main">
+    <div class="spoilage-header-top">
+      <div>
+        <h1>User Activity Log</h1>
+        <div class="spoilage-subtitle">View all actions performed by users/clients in the system</div>
+      </div>
+    </div>
+    <div class="report-generator-card">
+      <div class="report-filters activity-log-filters">
+        <div class="filter-controls">
+          <div class="filter-group">
+            <label for="activityTypeFilter">Activity Type</label>
+            <select id="activityTypeFilter">
+              <option value="">All</option>
+              <option value="login">Login</option>
+              <option value="logout">Logout</option>
+              <option value="edit">Update</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="activityDateStart">Start Date</label>
+            <input type="date" id="activityDateStart" />
+          </div>
+          <div class="filter-group">
+            <label for="activityDateEnd">End Date</label>
+            <input type="date" id="activityDateEnd" />
+          </div>
+        </div>
+        <div class="filter-actions">
+          <button class="filter-btn" id="filterActivityLogBtn">Filter</button>
+          <button class="filter-btn export" id="exportActivityLogExcel">Download Excel</button>
+          <button class="filter-btn export" id="exportActivityLogPDF">Download PDF</button>
+        </div>
+      </div>
+      <div class="report-preview-area">
+        <div class="report-preview-title">Activity Log</div>
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>User</th>
+              <th>Activity</th>
+              <th>Date/Time</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="activityLogTableBody">
+            <!-- Activity rows will be rendered here by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</template>
+
+
+    <!-- Admin activity log -->
+<template id="admin-log-template">
+  <div class="spoilage-main">
+    <div class="spoilage-header-top">
+      <div>
+        <h1>Admin Logs</h1>
+        <div class="spoilage-subtitle">View all actions performed by admins in the system</div>
+      </div>
+    </div>
+    <div class="report-generator-card">
+      <div class="report-filters admin-log-filters">
+        <div class="filter-controls">
+          <div class="filter-group">
+            <label for="adminActivityTypeFilter">Activity Type</label>
+            <select id="adminActivityTypeFilter">
+              <option value="">All</option>
+              <option value="update">Update</option>
+              <option value="create">Create</option>
+              <option value="delete">Delete</option>
+              <option value="login">Login</option>
+              <option value="logout">Logout</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="adminLogDateStart">Start Date</label>
+            <input type="date" id="adminLogDateStart" />
+          </div>
+          <div class="filter-group">
+            <label for="adminLogDateEnd">End Date</label>
+            <input type="date" id="adminLogDateEnd" />
+          </div>
+        </div>
+        <div class="filter-actions">
+          <button class="filter-btn" id="filterAdminLogBtn">Filter</button>
+          <button class="filter-btn export" id="exportAdminLogExcel">Download Excel</button>
+          <button class="filter-btn export" id="exportAdminLogPDF">Download PDF</button>
+        </div>
+      </div>
+      <div class="report-preview-area">
+        <div class="report-preview-title">Admin Log</div>
+        <table class="user-table">
+          <thead>
+            <tr>
+              <th>Admin</th>
+              <th>Activity</th>
+              <th>Date/Time</th>
+              <th>Details</th>
+            </tr>
+          </thead>
+          <tbody id="adminLogTableBody">
+            <!-- Admin log rows will be rendered here by JS -->
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="feedbacks-template">
+  <div class="feedbacks-container">
+    <div class="feedbacks-header">
+      <div>
+        <h1>Feedback Dashboard</h1>
+        <div class="feedbacks-subtitle">Manage customer feedback and support tickets</div>
+      </div>
+      <a href="#" class="feedbacks-tickets-link">8 feedbacks</a>
+    </div>
+    <div class="feedbacks-stats-row feedbacks-feedback-stats-row">
+      <div class="feedbacks-stat-card feedbacks-stat-blue"><span class="stat-icon">&#128172;</span><div class="stat-label">Total</div><div class="stat-value">8</div></div>
+      <div class="feedbacks-stat-card feedbacks-stat-yellow"><span class="stat-icon">&#11088;</span><div class="stat-label">Avg Rating</div><div class="stat-value stat-rating">3.6</div></div>
+      <div class="feedbacks-stat-card feedbacks-stat-green"><span class="stat-icon">&#128515;</span><div class="stat-label">Positive</div><div class="stat-value">5</div></div>
+      <div class="feedbacks-stat-card feedbacks-stat-yellow"><span class="stat-icon">&#128994;</span><div class="stat-label">5 Stars</div><div class="stat-value">3</div></div>
+      <div class="feedbacks-stat-card feedbacks-stat-red"><span class="stat-icon">&#128196;</span><div class="stat-label">Negative</div><div class="stat-value">2</div></div>
+      <div class="feedbacks-stat-card feedbacks-stat-blue"><span class="stat-icon">&#128337;</span><div class="stat-label">Recent (3d)</div><div class="stat-value">0</div></div>
+    </div>
+    <div class="feedbacks-filters-card">
+      <div class="feedbacks-filters-row">
+        <div class="feedbacks-filter search">
+          <label for="feedback-search">Name Search</label>
+          <input type="text" class="feedbacks-search-input" id="feedback-search" placeholder="Search feedback name...">
+        </div>
+        <div class="feedbacks-filter">
+          <label for="feedback-date-from">Start Date</label>
+          <input type="date" class="feedbacks-date-input" id="feedback-date-from">
+        </div>
+        <div class="feedbacks-filter">
+          <label for="feedback-date-to">End Date</label>
+          <input type="date" class="feedbacks-date-input" id="feedback-date-to">
+        </div>
+        <div class="feedbacks-filter">
+          <label>Star Rating</label>
+          <select class="feedbacks-filter-select">
+            <option>All Ratings</option>
+            <option>5</option>
+            <option>4</option>
+            <option>3</option>
+            <option>2</option>
+            <option>1</option>
+          </select>
+        </div>
+        <div class="feedbacks-filter">
+          <label>Sentiment</label>
+          <select class="feedbacks-filter-select">
+            <option>All</option>
+            <option>Positive</option>
+            <option>Negative</option>
+          </select>
+        </div>
+        <div class="feedbacks-export-buttons">
+          <button class="feedbacks-export-btn" id="export-feedbacks-excel">Export to Excel</button>
+          <button class="feedbacks-export-btn" id="export-feedbacks-pdf">Export to PDF</button>
+        </div>
+      </div>
+    </div>
+    <div class="feedbacks-table-card">
+      <table class="feedbacks-table">
+        <thead>
+          <tr>
+            <th>FEEDBACK</th>
+            <th>CUSTOMER</th>
+            <th>STAR RATING</th>
+            <th>SENTIMENT</th>
+            <th>CREATED</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><b>Great app, very useful!</b></td>
+            <td><b>John Doe</b></td>
+            <td><span class="badge badge-rating">5</span></td>
+            <td><span class="badge badge-positive">Positive</span></td>
+            <td>Jan 15, 2025, 06:30 PM</td>
+          </tr>
+          <tr>
+            <td><b>Needs dark mode.</b></td>
+            <td><b>Sarah Johnson</b></td>
+            <td><span class="badge badge-rating">3</span></td>
+            <td><span class="badge badge-negative">Negative</span></td>
+            <td>Jan 14, 2025, 10:20 PM</td>
+          </tr>
+          <tr>
+            <td><b>Payment works well.</b></td>
+            <td><b>Mike Wilson</b></td>
+            <td><span class="badge badge-rating">4</span></td>
+            <td><span class="badge badge-positive">Positive</span></td>
+            <td>Jan 16, 2025, 00:45 AM</td>
+          </tr>
+          <tr>
+            <td><b>Export is confusing.</b></td>
+            <td><b>Emma Brown</b></td>
+            <td><span class="badge badge-rating">2</span></td>
+            <td><span class="badge badge-negative">Negative</span></td>
+            <td>Jan 13, 2025, 07:00 PM</td>
+          </tr>
+          <tr>
+            <td><b>Love the mobile version!</b></td>
+            <td><b>David Lee</b></td>
+            <td><span class="badge badge-rating">5</span></td>
+            <td><span class="badge badge-positive">Positive</span></td>
+            <td>Jan 12, 2025, 05:30 PM</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</template>
+
+<script src="../assets/js/Admin/sidebarexpand.js"></script>
+<script src="../assets/js/Admin/analyticstat.js"></script>
+<script src="../assets/js/Admin/ad-chart.js"></script>
+<script src="../assets/js/Admin/Sensoranalytic.js"></script>
+<script src="../assets/js/Admin/sensor-analytics-connector.js"></script>
+<script src="../assets/js/Admin/spa.js"></script>
+<script src="../assets/js/Admin/report-generator.js"></script>
+<script src="../assets/js/Admin/user.js"></script>
+<script src="../assets/js/Admin/user-activity-log.js"></script>
+<script src="../assets/js/Admin/admin-log.js"></script>
+<script src="../assets/js/Admin/feedbacks.js"></script>
+<script src="../assets/js/Admin/account-modal.js"></script>
+<!-- Initialize all dashboard charts -->
+
+<script>
+function handleAdminPassFormSubmit(e) {
+  e.preventDefault();
+  const input = document.getElementById('adminPassInput');
+  if (input.value === ADMIN_PASSWORD) {
+    closeAdminPassModal();
+    setTimeout(() => {
+      if (pendingUserAction) {
+        if (pendingUserAction.type === 'add') {
+          openUserModal();
+          const nameInput = document.getElementById('userName');
+          if (nameInput) nameInput.focus();
+        }
+        if (pendingUserAction.type === 'edit') {
+          openUserModal(pendingUserAction.user);
+          const nameInput = document.getElementById('userName');
+          if (nameInput) nameInput.focus();
+        }
+      }
+    }, 100);
+  } else {
+    input.value = '';
+    input.placeholder = 'Incorrect password';
+    input.classList.add('error');
+    setTimeout(() => { input.placeholder = ''; input.classList.remove('error'); }, 1200);
+  }
+}
+</script>
+
+<!-- Admin Account Modal -->
+<div id="accountModal" class="account-modal" style="display:none;">
+  <div class="account-modal-content">
+    <span class="account-modal-close" id="accountModalClose">&times;</span>
+    <h2>Admin Account Details</h2>
+    <form id="accountModalForm">
+      <div class="account-form-group">
+        <label for="account-username">Account (Email/Username)</label>
+        <input type="text" id="account-username" name="account-username" required>
+      </div>
+      <div class="account-form-group">
+        <label for="account-name">Name</label>
+        <input type="text" id="account-name" name="account-name" required>
+      </div>
+      <div class="account-form-group">
+        <label for="account-password">Password</label>
+        <input type="password" id="account-password" name="account-password" required>
+      </div>
+      <div class="account-form-group">
+        <label for="account-role">Role</label>
+        <input type="text" id="account-role" name="account-role" value="Admin" readonly>
+      </div>
+      <div class="account-form-group">
+        <label for="account-phone">Phone</label>
+        <input type="text" id="account-phone" name="account-phone">
+      </div>
+      <div class="account-form-group">
+        <label for="account-created">Created</label>
+        <input type="text" id="account-created" name="account-created" readonly>
+      </div>
+      <div class="account-modal-actions">
+        <button type="submit" class="account-modal-save">Save</button>
+        <button type="button" class="account-modal-cancel" id="accountModalCancel">Cancel</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- Admin Logout Logic -->
+<script>
+(function() {
+  // Prevent event bubbling from logout button to parent (which may open modal)
+  var logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', function(e) {
+      e.stopPropagation(); // Prevent parent click events
+      // Clear all session/user data
+      localStorage.removeItem('currentUser');
+      localStorage.removeItem('sessionToken');
+      localStorage.removeItem('sessionExpires');
+      // Show logout message (toast)
+      var toast = document.createElement('div');
+      toast.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: #4caf50;
+        color: white;
+        padding: 15px 20px;
+        border-radius: 8px;
+        z-index: 10000;
+        font-size: 14px;
+        font-weight: 500;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      `;
+      toast.textContent = 'Logging out...';
+      document.body.appendChild(toast);
+      setTimeout(() => {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+        window.location.href = 'Login.php';
+      }, 1200);
+    });
+  }
+})();
+</script>
+
+</body>
+</html>

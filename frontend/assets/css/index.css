@@ -27,7 +27,7 @@ font-family: 'Montserrat', Helvetica, sans-serif;
 .floating-nav {
   position: fixed;
   top: 60px;
-  left :540px;
+  left :730px;
   transform: translateX(-50%);
   z-index: 1000;
   width: auto;
@@ -188,14 +188,9 @@ font-family: 'Montserrat', Helvetica, sans-serif;
   z-index: 1;
 }
 
-#page1 .image img {
-    width: 197vh;
-    height: 74vh;
-}
-
 .image img {
-    width: 104vh;
-    height: 65vh;
+    width: 180vh;
+    height: 71vh;
 }
 
 /* Blob Styling */
@@ -353,8 +348,8 @@ font-weight: bold;
 /* lemon Styling SLIDE 2 */
 .lemon1-image {
     position: absolute;
-    top: -22%;
-    left: 20%;
+    top: -12%;
+    left: 13%;
     width: 530PX;
     height: auto;
     transform: rotate(163deg) SCALEY(-1);
@@ -579,19 +574,18 @@ font-weight: bold;
 /* Style for the center dots */
 .center-dots {
     position: absolute;
-    top: 87%;
-    font-size: 0.5rem;
+    top: 82%;
+    font-size: 1.5rem;
     color: #0b08c5;
     display: flex;
     gap: 10px;
     background-color: white;
-    border-radius: 20px;
-    height: 3%;
-    width: 3%;
+    border-radius:  20px;
+    height: 5%;
+    width: 5%;
     justify-content: space-evenly;
     align-items: center;
 }
-
 .center-dots i {
   pointer-events: none;
 }
@@ -821,10 +815,10 @@ font-weight: bold;
 #page3 .M3-image {
     position: absolute;
     top: 66%;
-    left: 26%;
+    left: 19%;
     width: 503PX;
     height: auto;
-    transform: rotate(266deg);
+    transform: rotate(255deg);
     z-index: 1;
     pointer-events: none;
 }

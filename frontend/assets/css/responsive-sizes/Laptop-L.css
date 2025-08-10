@@ -1,8 +1,10 @@
-@media (max-width: 1440px) {
+@media (min-width: 1440px) {
 
     /*nav position*/
 .floating-nav {
     right: 50px;
+    width: 160vh;
+
 }
 
     /*Page1*/
@@ -79,23 +81,4 @@
     height: 3%;
     width: 3%;
 }
-
-
-/*page3*/
-#page3 .M3-image {
-    left: 14%;
 }
-
-/*center dot*/
-    .center-dots {
-        top: 87%;
-        font-size: 0.5rem;
-        gap: 10px;
-        height: 3%;
-        width: 3%;
-    }
-
-
-}/*end*/
-
-

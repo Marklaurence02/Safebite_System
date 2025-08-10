@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sensor API Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .test-button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        .test-button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 3px; white-space: pre-wrap; }
+        .error { background: #f8d7da; color: #721c24; }
+        .success { background: #d4edda; color: #155724; }
+    </style>
+</head>
+<body>
+    <h1>Sensor API Test</h1>
+    
+    <div class="test-section">
+        <h3>Test Main Sensor Data Endpoint</h3>
+        <button class="test-button" onclick="testMainEndpoint()">Test Main Endpoint</button>
+        <div id="main-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test Get Sensors Endpoint</h3>
+        <button class="test-button" onclick="testGetSensors()">Test Get Sensors</button>
+        <div id="sensors-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test Get Food Items Endpoint</h3>
+        <button class="test-button" onclick="testGetFoodItems()">Test Get Food Items</button>
+        <div id="food-result" class="result"></div>
+    </div>
+    
+    <div class="test-section">
+        <h3>Test Authentication</h3>
+        <p>This will test if the API properly requires authentication.</p>
+        <button class="test-button" onclick="testAuthentication()">Test Authentication</button>
+        <div id="auth-result" class="result"></div>
+    </div>
+
+    <script>
+        async function testMainEndpoint() {
+            const resultDiv = document.getElementById('main-result');
+            resultDiv.textContent = 'Testing...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('../backend/api/sensor-data.php');
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `Success! Status: ${response.status}\nData: ${JSON.stringify(result, null, 2)}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `Error! Status: ${response.status}\nResponse: ${JSON.stringify(result, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `Exception: ${error.message}`;
+            }
+        }
+        
+        async function testGetSensors() {
+            const resultDiv = document.getElementById('sensors-result');
+            resultDiv.textContent = 'Testing...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('../backend/api/sensor-data.php?action=get_sensors');
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `Success! Status: ${response.status}\nData: ${JSON.stringify(result, null, 2)}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `Error! Status: ${response.status}\nResponse: ${JSON.stringify(result, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `Exception: ${error.message}`;
+            }
+        }
+        
+        async function testGetFoodItems() {
+            const resultDiv = document.getElementById('food-result');
+            resultDiv.textContent = 'Testing...';
+            resultDiv.className = 'result';
+            
+            try {
+                const response = await fetch('../backend/api/sensor-data.php?action=get_food_items');
+                const result = await response.json();
+                
+                if (response.ok) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `Success! Status: ${response.status}\nData: ${JSON.stringify(result, null, 2)}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `Error! Status: ${response.status}\nResponse: ${JSON.stringify(result, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `Exception: ${error.message}`;
+            }
+        }
+        
+        async function testAuthentication() {
+            const resultDiv = document.getElementById('auth-result');
+            resultDiv.textContent = 'Testing...';
+            resultDiv.className = 'result';
+            
+            try {
+                // Test without any authentication
+                const response = await fetch('../backend/api/sensor-data.php');
+                const result = await response.json();
+                
+                if (response.status === 401) {
+                    resultDiv.className = 'result success';
+                    resultDiv.textContent = `Authentication working correctly! Status: ${response.status}\nResponse: ${JSON.stringify(result, null, 2)}`;
+                } else {
+                    resultDiv.className = 'result error';
+                    resultDiv.textContent = `Authentication not working! Status: ${response.status}\nResponse: ${JSON.stringify(result, null, 2)}`;
+                }
+            } catch (error) {
+                resultDiv.className = 'result error';
+                resultDiv.textContent = `Exception: ${error.message}`;
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeBite Authentication Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .container { max-width: 800px; margin: 0 auto; }
+        .section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 15px; margin: 5px; background: #007bff; color: white; border: none; border-radius: 3px; cursor: pointer; }
+        button:hover { background: #0056b3; }
+        .result { margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 3px; white-space: pre-wrap; }
+        input { padding: 8px; margin: 5px; width: 200px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>SafeBite Authentication & Sensor Data Test</h1>
+        
+        <div class="section info">
+            <h3>Current Session Status</h3>
+            <div id="session-status">Checking...</div>
+            <button onclick="checkSessionStatus()">Refresh Status</button>
+        </div>
+
+        <div class="section">
+            <h3>Login Test</h3>
+            <input type="email" id="email" placeholder="Email" value="marktiktok525@gmail.com">
+            <input type="password" id="password" placeholder="Password" value="password123">
+            <button onclick="testLogin()">Test Login</button>
+            <div id="login-result"></div>
+        </div>
+
+        <div class="section">
+            <h3>Sensor Data API Test</h3>
+            <button onclick="testSensorDataAPI()">Test Sensor Data API</button>
+            <div id="sensor-result"></div>
+        </div>
+
+        <div class="section">
+            <h3>Specific Sensor Test - SENSOR_GAS_15 (Gas)</h3>
+            <button onclick="testSpecificSensor()">Test SENSOR_GAS_15 Gas Sensor</button>
+            <div id="specific-sensor-result"></div>
+        </div>
+
+        <div class="section">
+            <h3>Database Connection Test</h3>
+            <button onclick="testDatabaseConnection()">Test Database</button>
+            <div id="db-result"></div>
+        </div>
+    </div>
+
+    <script>
+        // Check session status on page load
+        window.onload = function() {
+            checkSessionStatus();
+        };
+
+        function checkSessionStatus() {
+            const sessionToken = localStorage.getItem('sessionToken');
+            const currentUser = localStorage.getItem('currentUser');
+            const sessionExpires = localStorage.getItem('sessionExpires');
+            
+            const statusDiv = document.getElementById('session-status');
+            
+            if (sessionToken && currentUser && sessionExpires) {
+                const expires = new Date(sessionExpires);
+                const now = new Date();
+                const isExpired = expires < now;
+                
+                statusDiv.innerHTML = `
+                    <strong>Session Found:</strong><br>
+                    User: ${currentUser}<br>
+                    Token: ${sessionToken.substring(0, 20)}...<br>
+                    Expires: ${sessionExpires}<br>
+                    Status: <span style="color: ${isExpired ? 'red' : 'green'}">${isExpired ? 'EXPIRED' : 'VALID'}</span>
+                `;
+                statusDiv.className = 'section ' + (isExpired ? 'error' : 'success');
+            } else {
+                statusDiv.innerHTML = '<strong>No active session found</strong>';
+                statusDiv.className = 'section error';
+            }
+        }
+
+        async function testLogin() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const resultDiv = document.getElementById('login-result');
+            
+            try {
+                const response = await fetch('../../backend/api/login.php', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    // Store session data
+                    localStorage.setItem('sessionToken', result.sessionToken);
+                    localStorage.setItem('currentUser', result.user.email);
+                    localStorage.setItem('sessionExpires', result.sessionExpires);
+                    
+                    resultDiv.innerHTML = `<div class="success">Login successful! Session stored.</div>`;
+                    resultDiv.className = 'result success';
+                    
+                    // Refresh session status
+                    checkSessionStatus();
+                } else {
+                    resultDiv.innerHTML = `<div class="error">Login failed: ${result.error}</div>`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testSensorDataAPI() {
+            const sessionToken = localStorage.getItem('sessionToken');
+            const resultDiv = document.getElementById('sensor-result');
+            
+            if (!sessionToken) {
+                resultDiv.innerHTML = '<div class="error">No session token found. Please login first.</div>';
+                resultDiv.className = 'result error';
+                return;
+            }
+            
+            try {
+                const response = await fetch('../../backend/api/sensor-data.php', {
+                    headers: {
+                        'Authorization': `Bearer ${sessionToken}`
+                    }
+                });
+                
+                if (response.status === 401) {
+                    resultDiv.innerHTML = '<div class="error">Authentication failed (401 Unauthorized)</div>';
+                    resultDiv.className = 'result error';
+                    return;
+                }
+                
+                const result = await response.json();
+                
+                if (result.success) {
+                    resultDiv.innerHTML = `
+                        <div class="success">
+                            <strong>API Response:</strong><br>
+                            User ID: ${result.user_id}<br>
+                            Sensor Count: ${result.debug?.sensor_count || 'N/A'}<br>
+                            Reading Count: ${result.debug?.reading_count || 'N/A'}<br>
+                            <br><strong>Raw Data:</strong><br>
+                            ${JSON.stringify(result, null, 2)}
+                        </div>`;
+                    resultDiv.className = 'result success';
+                } else {
+                    resultDiv.innerHTML = `<div class="error">API Error: ${result.error}</div>`;
+                    resultDiv.className = 'result error';
+                }
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Error: ${error.message}</div>`;
+                resultDiv.className = 'result error';
+            }
+        }
+
+        async function testSpecificSensor() {
+            const sessionToken = localStorage.getItem('sessionToken');
+            const resultDiv = document.getElementById('specific-sensor-result');
+            
+            if (!sessionToken) {
+                resultDiv.innerHTML = '<div class="error">No session token found. Please login first.</div>';
+                resultDiv.className = 'result error';
+                return;
+            }
+            
+            // Test the main sensor data endpoint to see if SENSOR_GAS_15 data is returned
+            try {
+              const response = await fetch('backend/api/sensor-data.php', {
+                headers: {
+                  'Authorization': `Bearer ${sessionToken}`
+                }
+              });
+              
+              if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+              }
+              
+              const result = await response.json();
+              console.log('Sensor data response:', result);
+              
+              // Look specifically for SENSOR_GAS_15 (sensor_id = 15)
+              const gasSensorData = result.data.filter(item => 
+                item.device_id === 'SENSOR_GAS_15' || 
+                (item.sensor_type === 'Gas' && item.sensor_id === 15)
+              );
+              
+              if (gasSensorData.length > 0) {
+                const sensor = gasSensorData[0];
+                document.getElementById('specific-sensor-result').innerHTML = `
+                  <div class="success">
+                    <strong>SENSOR_GAS_15 Found!</strong><br>
+                    Device ID: ${sensor.device_id}<br>
+                    Device Name: ${sensor.device_name || 'N/A'}<br>
+                    Sensor Type: ${sensor.sensor_type}<br>
+                    Status: ${sensor.status || 'N/A'}<br>
+                    Last Update: ${sensor.last_update || 'N/A'}<br>
+                    Value: ${sensor.value}${sensor.unit}<br>
+                    Timestamp: ${sensor.timestamp}<br>
+                    User ID: ${result.user_id}
+                  </div>
+                `;
+              } else {
+                document.getElementById('specific-sensor-result').innerHTML = `
+                  <div class="error">
+                    <strong>SENSOR_GAS_15 Not Found in Response</strong><br>
+                    Available sensors:<br>
+                    ${result.data.map(item => `${item.device_id} (${item.sensor_type})`).join('<br>')}
+                  </div>
+                `;
+              }
+            } catch (error) {
+              document.getElementById('specific-sensor-result').innerHTML = `
+                <div class="error">Error testing specific sensor: ${error.message}</div>
+              `;
+            }
+        }
+
+        async function testDatabaseConnection() {
+            const resultDiv = document.getElementById('db-result');
+            
+            try {
+                const response = await fetch('../../backend/test-db.php');
+                const result = await response.text();
+                
+                resultDiv.innerHTML = `<div class="info">Database Test Result:<br>${result}</div>`;
+                resultDiv.className = 'result info';
+            } catch (error) {
+                resultDiv.innerHTML = `<div class="error">Database Test Error: ${error.message}</div>`;
+                resultDiv.className = 'result error';
+            }
+        }
+    </script>
+</body>
+</html>

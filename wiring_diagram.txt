@@ -1,0 +1,62 @@
+ESP8266-01S USB Power Setup with Capacitors
+============================================
+
+Wiring Diagram:
+┌─────────────────────────────────────────────────────────┐
+│                    Arduino Uno                          │
+│  ┌─────────┐                                            │
+│  │ USB     │                                            │
+│  │ Power   │                                            │
+│  └─────────┘                                            │
+│       │                                                 │
+│       ▼                                                 │
+│  ┌─────────┐                                            │
+│  │ 3.3V    │───▶ 100µF ──▶ 100µF ──▶ ESP8266-01S VCC   │
+│  │ GND     │───▶ 100µF ──▶ 100µF ──▶ ESP8266-01S GND   │
+│  └─────────┘                                            │
+│       │                                                 │
+│       ▼                                                 │
+│  ┌─────────┐                                            │
+│  │ Pin 8   │◀─── ESP8266-01S TX                        │
+│  │ Pin 9   │───▶ ESP8266-01S RX                        │
+│  └─────────┘                                            │
+└─────────────────────────────────────────────────────────┘
+                              │
+                              ▼
+                    ┌─────────────────┐
+                    │ ESP8266-01S     │
+                    │ ┌─────────────┐ │
+                    │ │ VCC         │ │
+                    │ │ GND         │ │
+                    │ │ TX          │ │
+                    │ │ RX          │ │
+                    │ │ CH_PD       │◀┼── 3.3V (Enable)
+                    │ │ GPIO0       │◀┼── GND (Normal mode)
+                    │ │ GPIO2       │ │ (Not connected)
+                    │ └─────────────┘ │
+                    └─────────────────┘
+
+Capacitor Setup:
+- Use 100µF electrolytic capacitors
+- Connect capacitors between VCC and GND lines
+- This provides extra current during WiFi operations
+
+Alternative Capacitor Setup:
+- 100µF + 10µF in parallel for better filtering
+- 330µF single capacitor if available
+
+Power Management Features Added:
+1. WiFi connection status tracking
+2. Automatic reconnection attempts
+3. Longer timeouts for USB power
+4. Skip server communication if WiFi fails
+5. Power-efficient operation
+
+Testing Steps:
+1. Upload the updated code
+2. Check Serial Monitor for "ESP8266-01S is responding!"
+3. Monitor WiFi connection attempts
+4. If WiFi fails, capacitors may not be enough
+5. Consider external 3.3V power supply if needed
+
+

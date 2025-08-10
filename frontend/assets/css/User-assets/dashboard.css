@@ -1,0 +1,397 @@
+/* css/dashboard.css */
+/* Styles for the main content area and dashboard cards */
+
+body {
+  background: #5E5E5E;
+  margin: 0;
+  font-family: 'Open Sans', Helvetica Neue, Helvetica, Arial, sans-serif;
+  color: #ffffff;
+  padding-left: 0;
+  font-size: 16px;
+}
+main {
+  position: relative;
+  min-height: 100vh;
+  padding: 40px 0 0 0;
+}
+
+.dashboard-container {
+  margin-left: 260px; /* Space for expanded sidebar */
+  padding: 40px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  transition: margin-left 0.25s cubic-bezier(.4,0,.2,1);
+}
+
+/* Adjust margin when sidebar is collapsed */
+.sidebar.collapsed ~ main .dashboard-container {
+  margin-left: 84px;
+}
+
+.dashboard-row {
+  display: flex;
+  gap: 30px;
+}
+
+.dashboard-card {
+  background: #0a1a36;
+  border-radius: 10px;
+  box-shadow: 0 2px 16px 0 rgba(0,0,0,0.15);
+  padding: 30px;
+  color: #fff;
+  flex: 1;
+  min-width: 0;
+  min-height: 200px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.dashboard-card.small {
+  min-width: 250px;
+  max-width: 350px;
+  flex: none;
+}
+
+.dashboard-card.tall {
+  min-height: 300px;
+}
+
+/* Sensors Card Styles */
+.sensors-card {
+  background: #1a2340;
+  border-radius: 16px;
+  padding: 24px;
+}
+
+.sensors-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+}
+
+.sensors-header h4 {
+  color: #e9ecef;
+  font-size: 20px;
+  font-weight: 700;
+  margin: 0 0 18px 0;
+}
+
+.sensors-select {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #bfc9da;
+  font-size: 1em;
+}
+
+.sensors-select label {
+  color: #e0e6f6;
+  font-size: 1em;
+}
+
+.sensors-select select {
+  background: #14224a;
+  color: #fff;
+  border: 1px solid #2a3b6d;
+  border-radius: 6px;
+  padding: 4px 16px;
+  font-size: 1em;
+  outline: none;
+}
+
+.sensors-gauges {
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+}
+
+.stat-cards-container {
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+}
+
+.stat-card {
+  background: linear-gradient(135deg, #14224a 0%, #1a2340 100%);
+  color: #fff;
+  border-radius: 16px;
+  padding: 28px 24px 18px 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 180px;
+  box-shadow:1px 0px 14px 18px rgba(0, 0, 0, 0.10);
+}
+
+.stat-card.highlight {
+  background: linear-gradient(135deg, #14224a 0%, #1a2340 100%);
+}
+
+.stat-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.stat-icon {
+  background-color: transparent;
+}
+
+.stat-icon svg {
+  width: 32px;
+  height: 32px;
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.stat-value {
+  font-size: 2.2em;
+  font-weight: 700;
+  color: #fff;
+}
+
+.stat-label {
+  font-size: 1em;
+  color: #e0e6f6;
+  margin-top: 2px;
+}
+
+.stat-chart {
+  width: 100%;
+  height: 60px;
+}
+
+.stat-chart canvas {
+  width: 100%;
+  height: 100%;
+}
+
+/* Remove gradient styles */
+.gradient-1, .gradient-2, .gradient-3 {
+  background: none;
+}
+
+/* Sensor Dashboard Styles */
+.sensor-cards-container {
+  display: flex;
+  gap: 24px;
+  justify-content: space-between;
+  margin-bottom: 20px;
+}
+
+.sensor-card {
+  background: linear-gradient(135deg, #14224a 0%, #1a2340 100%);
+  color: #fff;
+  border-radius: 16px;
+  padding: 28px 24px 18px 24px;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 200px;
+  box-shadow: 1px 0px 14px 18px rgba(0, 0, 0, 0.10);
+}
+
+.sensor-card.highlight {
+  background: linear-gradient(135deg, #1a2340 0%, #14224a 100%);
+  border: 1px solid #2a3b6d;
+}
+
+.sensor-card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+}
+
+.sensor-icon {
+  background-color: transparent;
+}
+
+.sensor-icon svg {
+  width: 32px;
+  height: 32px;
+  stroke: #fff;
+  stroke-width: 2;
+}
+
+.sensor-info {
+  flex: 1;
+}
+
+.sensor-label {
+  font-size: 1em;
+  color: #e0e6f6;
+  margin-bottom: 4px;
+}
+
+.sensor-value {
+  font-size: 1.8em;
+  font-weight: 700;
+  color: #fff;
+}
+
+.sensor-gauge {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 1;
+}
+
+.gauge {
+  width: 120px;
+  height: 120px;
+  position: relative;
+}
+
+.add-device-btn {
+  background: #2a3b6d;
+  color: #fff;
+  border: 1px solid #3a4b7d;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 0.9em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.add-device-btn:hover {
+  background: #3a4b7d;
+  border-color: #4a5b8d;
+}
+
+.device-info {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: #14224a;
+  border-radius: 8px;
+  padding: 16px 20px;
+  margin-top: 20px;
+  border: 1px solid #2a3b6d;
+}
+
+.device-id-display {
+  color: #e0e6f6;
+  font-size: 0.95em;
+}
+
+.device-status {
+  color: #e0e6f6;
+  font-size: 0.95em;
+}
+
+.status-online {
+  color: #4ade80;
+  font-weight: 600;
+}
+
+.status-offline {
+  color: #f87171;
+  font-weight: 600;
+}
+
+.alerts-container {
+  margin-top: 16px;
+}
+
+.no-alerts {
+  color: #9ca3af;
+  font-style: italic;
+  text-align: center;
+  padding: 20px;
+}
+
+.alert-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 8px;
+  border-radius: 8px;
+  background: #14224a;
+  border-left: 4px solid;
+}
+
+.alert-warning {
+  border-left-color: #fbbf24;
+  background: linear-gradient(135deg, #14224a 0%, #1a2340 100%);
+}
+
+.alert-danger {
+  border-left-color: #f87171;
+  background: linear-gradient(135deg, #14224a 0%, #1a2340 100%);
+}
+
+.alert-icon {
+  font-size: 1.2em;
+  flex-shrink: 0;
+}
+
+.alert-content {
+  flex: 1;
+}
+
+.alert-message {
+  color: #fff;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.alert-sensor {
+  color: #9ca3af;
+  font-size: 0.85em;
+}
+
+.device-info.info-bar-highlight-online {
+  border: 2px solid #4ade80;
+  box-shadow: 0 0 12px 2px #4ade8055;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.device-info.info-bar-highlight-offline {
+  border: 2px solid #f87171;
+  box-shadow: 0 0 12px 2px #f8717155;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.sensor-card-highlight-online {
+  border: 2px solid #4ade80 !important;
+  box-shadow: 0 0 16px 2px #4ade8055;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+.sensor-card-highlight-offline {
+  border: 2px solid #f87171 !important;
+  box-shadow: 0 0 16px 2px #f8717155;
+  transition: border 0.2s, box-shadow 0.2s;
+}
+
+.sensor-card-disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  box-shadow: none !important;
+  border: 1px solid #2a3b6d !important;
+  pointer-events: auto;
+}
+
+/* Media query for responsive dashboard layout */
+@media screen and (max-width:900px) {
+  .dashboard-container {
+    margin-left: 0;
+    padding: 20px 5px;
+  }
+  
+  .sensor-cards-container {
+    flex-direction: column;
+    gap: 16px;
+  }
+  
+  .device-info {
+    flex-direction: column;
+    gap: 8px;
+    align-items: flex-start;
+  }
+} 

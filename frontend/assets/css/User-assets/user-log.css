@@ -1,0 +1,156 @@
+/* User Log Page Styles */
+.user-log-main {
+  margin-left: 260px;
+  padding: 32px 32px 32px 32px;
+  min-height: 100vh;
+  background: #181f36;
+}
+.sidebar.collapsed ~ #main-content .user-log-main {
+  margin-left: 84px;
+}
+.user-log-header {
+  margin-bottom: 24px;
+}
+.user-log-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  color: #e0e0e0;
+  margin-bottom: 6px;
+}
+.user-log-subtitle {
+  color: #b0b0b0;
+  font-size: 1.1rem;
+}
+.user-log-card {
+  background: #212c4d;
+  border-radius: 16px;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.10);
+  padding: 32px 32px 24px 32px;
+  margin-bottom: 32px;
+}
+.user-log-filters {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+  margin-bottom: 18px;
+  align-items: flex-end;
+}
+.user-log-filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 160px;
+}
+.user-log-filter-group label {
+  color: #bfc9da;
+  font-size: 1em;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+.user-log-filter-group input,
+.user-log-filter-group select {
+  background: #181f36;
+  color: #fff;
+  border: 1px solid #2a3b6d;
+  border-radius: 6px;
+  padding: 7px 12px;
+  font-size: 1em;
+  outline: none;
+}
+.user-log-filter-actions {
+  display: flex;
+  gap: 14px;
+}
+.user-log-btn {
+  padding: 8px 22px;
+  border: none;
+  border-radius: 7px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.18s;
+}
+.user-log-btn-primary {
+  background: #4a9eff;
+  color: #fff;
+}
+.user-log-btn-primary:hover {
+  background: #2563eb;
+}
+.user-log-btn-secondary {
+  background: #3a4a6b;
+  color: #e0e0e0;
+}
+.user-log-btn-secondary:hover {
+  background: #4a5a7b;
+}
+.user-log-table-card {
+  background: #212c4d;
+  border-radius: 14px;
+  box-shadow: 0 2px 12px 0 rgba(0,0,0,0.08);
+  padding: 18px 18px 8px 18px;
+}
+.user-log-table-title {
+  font-size: 1.1em;
+  font-weight: 700;
+  color: #e9ecef;
+  margin-bottom: 12px;
+}
+.user-log-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  background: none;
+}
+.user-log-table th {
+  background: #22336a;
+  color: #bfc9da;
+  font-size: 1em;
+  font-weight: 700;
+  padding: 12px 10px;
+  text-align: left;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+}
+.user-log-table td {
+  background: #181f36;
+  color: #fff;
+  font-size: 1em;
+  padding: 12px 10px;
+  border-bottom: 1px solid #2a3b6d;
+  vertical-align: top;
+}
+.user-log-table tr:last-child td {
+  border-bottom: none;
+}
+.user-log-activity-badge {
+  border-radius: 6px;
+  padding: 3px 12px;
+  font-size: 0.98em;
+  font-weight: 600;
+  background: #344e6e;
+  color: #fff;
+  display: inline-block;
+}
+.user-log-activity-badge.add { background: #28a745; color: #fff; }
+.user-log-activity-badge.edit { background: #17a2b8; color: #fff; }
+.user-log-activity-badge.update { background: #ffc107; color: #212529; }
+.user-log-activity-badge.delete { background: #dc3545; color: #fff; }
+.user-log-activity-badge.login { background: #4a9eff; color: #fff; }
+.user-log-activity-badge.logout { background: #6c757d; color: #fff; }
+@media (max-width: 900px) {
+  .user-log-main {
+    margin-left: 0;
+    padding: 16px 4px;
+  }
+  .user-log-card {
+    padding: 12px 2px 8px 2px;
+  }
+  .user-log-table-card {
+    padding: 8px 2px 2px 2px;
+  }
+  .user-log-filters {
+    flex-direction: column;
+    gap: 12px;
+  }
+} 

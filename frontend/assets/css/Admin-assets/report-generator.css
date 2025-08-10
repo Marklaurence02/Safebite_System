@@ -1,0 +1,119 @@
+/* --- Report Generator --- */
+.report-generator-card {
+  background: #212c4d;
+  border-radius: 14px;
+  padding: 32px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.2);
+}
+
+.report-filters {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  margin-bottom: 32px;
+  flex-wrap: wrap;
+}
+
+.filter-controls {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+}
+
+.filter-group {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 200px;
+}
+
+.filter-group label {
+  font-size: 0.9em;
+  color: #bfc9da;
+  font-weight: 600;
+}
+
+.filter-group select,
+.filter-group input {
+  background: #181f36;
+  border: 1px solid #3a4a8b;
+  color: #fff;
+  border-radius: 6px;
+  padding: 10px 14px;
+  font-size: 1em;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23bfc9da' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='M2 5l6 6 6-6'/%3e%3c/svg%3e");
+  background-repeat: no-repeat;
+  background-position: right 0.7rem center;
+  background-size: 1em;
+}
+
+.filter-actions {
+  display: flex;
+  gap: 12px;
+}
+
+.filter-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 24px;
+  font-size: 1em;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.filter-btn#generateReport {
+  background-color: #3b7bfa;
+  color: #fff;
+}
+.filter-btn#generateReport:hover {
+  background-color: #2a68e8;
+}
+
+.filter-btn.export {
+  background-color: #2c3a6b;
+  color: #bfc9da;
+}
+.filter-btn.export:hover {
+  background-color: #3a4a8b;
+}
+
+
+.report-preview-area {
+  background: #1a2342;
+  border-radius: 10px;
+  padding: 24px;
+  min-height: 200px;
+}
+
+.report-preview-title {
+  font-size: 1.2em;
+  font-weight: 700;
+  margin-bottom: 16px;
+  color: #fff;
+}
+
+.detailed-report-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+.detailed-report-table th {
+  text-align: left;
+  padding: 12px 16px;
+  color: #bfc9da;
+  font-size: 0.9em;
+  font-weight: 600;
+  border-bottom: 1px solid #3a4a8b;
+  text-transform: uppercase;
+}
+.detailed-report-table td {
+  padding: 14px 16px;
+  border-bottom: 1px solid #22336a;
+  color: #e9ecef;
+  vertical-align: middle;
+}
+.detailed-report-table tr:last-child td {
+  border-bottom: none;
+}

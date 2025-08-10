@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SafeBite Connection Test</title>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ccc; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        .info { background-color: #d1ecf1; border-color: #bee5eb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        pre { background: #f8f9fa; padding: 10px; border-radius: 3px; overflow-x: auto; }
+    </style>
+</head>
+<body>
+    <h1>SafeBite API Connection Test</h1>
+    
+    <div class="test-section info">
+        <h3>Test Instructions</h3>
+        <p>Click the buttons below to test the connection between frontend and backend:</p>
+        <ol>
+            <li>Test basic API connection</li>
+            <li>Test sensor devices fetch</li>
+            <li>Test food items fetch</li>
+            <li>Test latest sensor data</li>
+        </ol>
+    </div>
+
+    <div class="test-section">
+        <h3>API Tests</h3>
+        <button onclick="testBasicConnection()">Test Basic Connection</button>
+        <button onclick="testGetSensors()">Test Get Sensors</button>
+        <button onclick="testGetFoodItems()">Test Get Food Items</button>
+        <button onclick="testGetLatestData()">Test Get Latest Data</button>
+        <button onclick="clearResults()">Clear Results</button>
+    </div>
+
+    <div class="test-section">
+        <h3>Test Results</h3>
+        <div id="results"></div>
+    </div>
+
+    <script>
+        const resultsDiv = document.getElementById('results');
+
+        function addResult(title, data, isSuccess = true) {
+            const div = document.createElement('div');
+            div.className = `test-section ${isSuccess ? 'success' : 'error'}`;
+            div.innerHTML = `
+                <h4>${title}</h4>
+                <pre>${JSON.stringify(data, null, 2)}</pre>
+            `;
+            resultsDiv.appendChild(div);
+        }
+
+        async function testBasicConnection() {
+            try {
+                const response = await fetch('../backend/api/sensor-data.php');
+                const result = await response.json();
+                addResult('Basic Connection Test', result, true);
+            } catch (error) {
+                addResult('Basic Connection Test', { error: error.message }, false);
+            }
+        }
+
+        async function testGetSensors() {
+            try {
+                const response = await fetch('../backend/api/sensor-data.php?action=get_sensors');
+                const result = await response.json();
+                addResult('Get Sensors Test', result, true);
+            } catch (error) {
+                addResult('Get Sensors Test', { error: error.message }, false);
+            }
+        }
+
+        async function testGetFoodItems() {
+            try {
+                const response = await fetch('../backend/api/sensor-data.php?action=get_food_items');
+                const result = await response.json();
+                addResult('Get Food Items Test', result, true);
+            } catch (error) {
+                addResult('Get Food Items Test', { error: error.message }, false);
+            }
+        }
+
+        async function testGetLatestData() {
+            try {
+                const response = await fetch('../backend/api/sensor-data.php');
+                const result = await response.json();
+                addResult('Get Latest Data Test', result, true);
+            } catch (error) {
+                addResult('Get Latest Data Test', { error: error.message }, false);
+            }
+        }
+
+        function clearResults() {
+            resultsDiv.innerHTML = '';
+        }
+
+        // Auto-test on page load
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                testBasicConnection();
+            }, 1000);
+        });
+    </script>
+</body>
+</html>
