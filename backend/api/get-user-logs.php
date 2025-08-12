@@ -7,8 +7,8 @@ header('Access-Control-Allow-Headers: Content-Type, Authorization');
 // Include database configuration
 require_once '../config/database.php';
 
-// Function to get current user ID from session token
-function getCurrentUserId($pdo) {
+// Function to get current user ID and username from session token
+function getCurrentUser($pdo) {
     // Check Authorization header for session token
     $headers = getallheaders();
     if (isset($headers['Authorization'])) {
@@ -17,16 +17,21 @@ function getCurrentUserId($pdo) {
             $token = substr($authHeader, 7);
             
             $stmt = $pdo->prepare("
-                SELECT user_id FROM sessions 
-                WHERE session_token = ? AND expires_at > NOW()
-                ORDER BY created_at DESC 
+                SELECT s.user_id, u.username 
+                FROM sessions s
+                JOIN users u ON s.user_id = u.user_id
+                WHERE s.session_token = ? AND s.expires_at > NOW()
+                ORDER BY s.created_at DESC 
                 LIMIT 1
             ");
             $stmt->execute([$token]);
             $session = $stmt->fetch();
             
             if ($session) {
-                return $session['user_id'];
+                return [
+                    'user_id' => $session['user_id'],
+                    'username' => $session['username']
+                ];
             }
         }
     }
@@ -37,7 +42,17 @@ function getCurrentUserId($pdo) {
     }
     
     if (isset($_SESSION['user_id'])) {
-        return $_SESSION['user_id'];
+        // Get username from users table
+        $stmt = $pdo->prepare("SELECT username FROM users WHERE user_id = ?");
+        $stmt->execute([$_SESSION['user_id']]);
+        $user = $stmt->fetch();
+        
+        if ($user) {
+            return [
+                'user_id' => $_SESSION['user_id'],
+                'username' => $user['username']
+            ];
+        }
     }
     
     return null;
@@ -48,9 +63,9 @@ try {
     $database = new Database();
     $pdo = $database->getConnection();
     
-    $currentUserId = getCurrentUserId($pdo);
+    $currentUser = getCurrentUser($pdo);
     
-    if (!$currentUserId) {
+    if (!$currentUser) {
         http_response_code(401);
         echo json_encode(['error' => 'Authentication required']);
         exit;
@@ -68,7 +83,7 @@ try {
     
     // Build the WHERE clause
     $whereConditions = ["user_id = :user_id"];
-    $params = [':user_id' => $currentUserId];
+    $params = [':user_id' => $currentUser['user_id']];
     
     // Add action type filter
     if ($actionType && $actionType !== 'all') {
@@ -147,6 +162,7 @@ try {
         $formattedLogs[] = [
             'log_id' => $log['log_id'],
             'user_id' => $log['user_id'],
+            'username' => $currentUser['username'], // Use current user's username
             'action' => $log['action'],
             'timestamp' => $log['timestamp']
         ];
@@ -155,6 +171,10 @@ try {
     echo json_encode([
         'success' => true,
         'data' => $formattedLogs,
+        'user_info' => [
+            'user_id' => $currentUser['user_id'],
+            'username' => $currentUser['username']
+        ],
         'pagination' => [
             'current_page' => $page,
             'total_pages' => $totalPages,

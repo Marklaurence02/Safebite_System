@@ -161,7 +161,7 @@ window.initUserLogPage = function() {
       const displayAction = formatActionText(item.action);
       
       row.innerHTML = `
-        <td>User ${item.user_id}</td>
+        <td>${item.username || 'User ' + item.user_id}</td>
         <td><span class="user-log-activity-badge ${actionType}">${displayAction}</span></td>
         <td>${formatTimestamp(item.timestamp)}</td>
         <td>${item.action}</td>
