@@ -85,10 +85,17 @@ class Auth {
         try {
             $query = "INSERT INTO activity_logs (user_id, action) VALUES (?, ?)";
             $stmt = $db->prepare($query);
-            $stmt->execute([$userId, $action]);
+            $result = $stmt->execute([$userId, $action]);
+            
+            if ($result) {
+                error_log("Activity logged successfully: User ID $userId, Action: '$action'");
+            } else {
+                error_log("Failed to log activity: User ID $userId, Action: '$action' - Statement failed");
+            }
         } catch (Exception $e) {
-            // Log error silently
-            error_log("Activity log error: " . $e->getMessage());
+            // Log error with more details
+            error_log("Activity log error for User ID $userId, Action '$action': " . $e->getMessage());
+            error_log("Error trace: " . $e->getTraceAsString());
         }
     }
 }

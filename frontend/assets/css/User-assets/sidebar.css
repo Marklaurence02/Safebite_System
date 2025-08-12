@@ -1,7 +1,6 @@
 /* css/sidebar.css */
 /* Styles for the collapsible sidebar navigation */
 
-
 .sidebar {
   position: fixed;
   top: 0;
@@ -13,8 +12,9 @@
   border-radius: 8px;
   display: flex;
   flex-direction: column;
-  transition: width 0.25s cubic-bezier(.4,0,.2,1), left 0.25s cubic-bezier(.4,0,.2,1);
-  z-index: 10;
+  transition: all 0.3s cubic-bezier(.4,0,.2,1);
+  z-index: 1000;
+  transform: translateX(0);
 }
 
 .sidebar.collapsed {
@@ -171,15 +171,132 @@
   overflow: hidden;
 }
 
-/* Media query for responsive sidebar behavior */
-@media screen and (max-width:900px) {
+/* Hamburger Menu Button */
+.hamburger-menu {
+  position: fixed;
+  top: 15px;
+  left: 15px;
+  z-index: 1001;
+  background: #0B1739;
+  color: #ffffff;
+  border: none;
+  border-radius: 8px;
+  font-size: 1.5rem;
+  padding: 10px 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: none;
+}
+
+.hamburger-menu:hover {
+  background: #142c6d;
+  transform: scale(1.05);
+}
+
+.hamburger-menu.active {
+  background: #ffffff;
+  color: #000000;
+
+}
+
+/* Overlay for mobile menu */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s ease;
+}
+
+.sidebar-overlay.active {
+  opacity: 1;
+  visibility: visible;
+}
+
+/* Main content adjustment */
+#main-content {
+  transition: margin-left 0.3s ease;
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  .hamburger-menu {
+    display: block;
+  }
+  
   .sidebar {
-    left: -240px;
+    transform: translateX(-100%);
+    width: 280px;
+    border-radius: 0 8px 8px 0;
   }
-  .sidebar.expanded {
-    left: 0;
+  
+  .sidebar.mobile-open {
+    transform: translateX(0);
   }
+  
   .sidebar.collapsed {
-    left: -64px;
+    width: 280px;
+  }
+  
+  .sidebar.collapsed .sidebar-title,
+  .sidebar.collapsed .nav-text,
+  .sidebar.collapsed .account-text {
+    opacity: 1;
+    width: auto;
+    overflow: visible;
+  }
+  
+  #main-content {
+    margin-left: 0 !important;
+    padding-top: 60px;
+  }
+  
+  /* Ensure all text is visible on mobile */
+  .nav-text {
+    opacity: 1 !important;
+    width: auto !important;
+    overflow: visible !important;
+  }
+  
+  .sidebar-title {
+    opacity: 1 !important;
+    width: auto !important;
+    overflow: visible !important;
+  }
+  
+  .account-text {
+    opacity: 1 !important;
+    width: auto !important;
+    overflow: visible !important;
+  }
+  
+  .logout-btn {
+    opacity: 1 !important;
+    width: auto !important;
+    overflow: visible !important;
+  }
+}
+
+@media screen and (min-width: 769px) {
+  .hamburger-menu {
+    display: none;
+  }
+  
+  .sidebar {
+    transform: translateX(0);
+  }
+  
+  #main-content {
+    margin-left: 240px;
+  }
+  
+  .sidebar.collapsed + #main-content {
+    margin-left: 64px;
   }
 } 

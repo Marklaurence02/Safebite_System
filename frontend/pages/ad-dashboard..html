@@ -818,31 +818,102 @@ function handleAdminPassFormSubmit(e) {
   if (logoutBtn) {
     logoutBtn.addEventListener('click', function(e) {
       e.stopPropagation(); // Prevent parent click events
-      // Clear all session/user data
-      localStorage.removeItem('currentUser');
-      localStorage.removeItem('sessionToken');
-      localStorage.removeItem('sessionExpires');
-      // Show logout message (toast)
-      var toast = document.createElement('div');
-      toast.style.cssText = `
-        position: fixed;
-        top: 20px;
-        right: 20px;
-        background: #4caf50;
-        color: white;
-        padding: 15px 20px;
-        border-radius: 8px;
-        z-index: 10000;
-        font-size: 14px;
-        font-weight: 500;
-        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      `;
-      toast.textContent = 'Logging out...';
-      document.body.appendChild(toast);
-      setTimeout(() => {
-        if (toast.parentNode) toast.parentNode.removeChild(toast);
-        window.location.href = 'Login.php';
-      }, 1200);
+      
+      const sessionToken = localStorage.getItem('sessionToken');
+      
+      if (sessionToken) {
+        // Call backend logout API to log the activity
+        fetch('../../backend/api/logout.php', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${sessionToken}`
+          }
+        })
+        .then(response => response.json())
+        .then(data => {
+          // Clear all session/user data regardless of API response
+          localStorage.removeItem('currentUser');
+          localStorage.removeItem('sessionToken');
+          localStorage.removeItem('sessionExpires');
+          
+          // Show logout message (toast)
+          var toast = document.createElement('div');
+          toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            z-index: 10000;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          `;
+          toast.textContent = 'Logging out...';
+          document.body.appendChild(toast);
+          setTimeout(() => {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+            window.location.href = 'Login.php';
+          }, 1200);
+        })
+        .catch(error => {
+          console.error('Logout API error:', error);
+          // Still logout even if API fails
+          localStorage.removeItem('currentUser');
+          localStorage.removeItem('sessionToken');
+          localStorage.removeItem('sessionExpires');
+          
+          var toast = document.createElement('div');
+          toast.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: #4caf50;
+            color: white;
+            padding: 15px 20px;
+            border-radius: 8px;
+            z-index: 10000;
+            font-size: 14px;
+            font-weight: 500;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+          `;
+          toast.textContent = 'Logging out...';
+          document.body.appendChild(toast);
+          setTimeout(() => {
+            if (toast.parentNode) toast.parentNode.removeChild(toast);
+            window.location.href = 'Login.php';
+          }, 1200);
+        });
+      } else {
+        // Fallback if no session token
+        localStorage.removeItem('currentUser');
+        localStorage.removeItem('sessionToken');
+        localStorage.removeItem('sessionExpires');
+        
+        var toast = document.createElement('div');
+        toast.style.cssText = `
+          position: fixed;
+          top: 20px;
+          right: 20px;
+          background: #4caf50;
+          color: white;
+          padding: 15px 20px;
+          border-radius: 8px;
+          z-index: 10000;
+          font-size: 14px;
+          font-weight: 500;
+          box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+        `;
+        toast.textContent = 'Logging out...';
+        document.body.appendChild(toast);
+        setTimeout(() => {
+          if (toast.parentNode) toast.parentNode.removeChild(toast);
+          window.location.href = 'Login.php';
+        }, 1200);
+      }
     });
   }
 })();

@@ -36,16 +36,57 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Handle logout
     function handleLogout() {
-        // Clear user data
-        localStorage.removeItem('currentUser');
+        const sessionToken = localStorage.getItem('sessionToken');
         
-        // Show logout message
-        showLogoutMessage();
-        
-        // Redirect to login page after a short delay
-        setTimeout(() => {
-            window.location.href = '../pages/Login.php';
-        }, 1500);
+        if (sessionToken) {
+            // Call backend logout API to log the activity
+            fetch('../../backend/api/logout.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${sessionToken}`
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Clear user data regardless of API response
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('sessionToken');
+                localStorage.removeItem('sessionExpires');
+                
+                // Show logout message
+                showLogoutMessage();
+                
+                // Redirect to login page after a short delay
+                setTimeout(() => {
+                    window.location.href = '../pages/Login.php';
+                }, 1500);
+            })
+            .catch(error => {
+                console.error('Logout API error:', error);
+                // Still logout even if API fails
+                localStorage.removeItem('currentUser');
+                localStorage.removeItem('sessionToken');
+                localStorage.removeItem('sessionExpires');
+                
+                showLogoutMessage();
+                
+                setTimeout(() => {
+                    window.location.href = '../pages/Login.php';
+                }, 1500);
+            });
+        } else {
+            // Fallback if no session token
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('sessionToken');
+            localStorage.removeItem('sessionExpires');
+            
+            showLogoutMessage();
+            
+            setTimeout(() => {
+                window.location.href = '../pages/Login.php';
+            }, 1500);
+        }
     }
 
     // Show logout message

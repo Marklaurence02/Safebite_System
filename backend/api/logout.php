@@ -34,20 +34,36 @@ try {
         Auth::sendResponse(['error' => 'Database connection failed'], 500);
     }
     
-    // Find and delete session
+    // Find session first
     $query = "SELECT user_id FROM sessions WHERE session_token = ? AND expires_at > NOW()";
     $stmt = $db->prepare($query);
     $stmt->execute([$token]);
     $session = $stmt->fetch();
     
     if ($session) {
-        // Log logout activity
-        Auth::logActivity($session['user_id'], 'User logged out', $db);
+        $userId = $session['user_id'];
         
-        // Delete session
-        $deleteQuery = "DELETE FROM sessions WHERE session_token = ?";
-        $deleteStmt = $db->prepare($deleteQuery);
-        $deleteStmt->execute([$token]);
+        // Log logout activity FIRST (before deleting session)
+        try {
+            Auth::logActivity($userId, 'User logged out', $db);
+            error_log("Logout activity logged successfully for user ID: $userId");
+        } catch (Exception $e) {
+            error_log("Failed to log logout activity: " . $e->getMessage());
+            // Continue with logout even if logging fails
+        }
+        
+        // Delete session AFTER logging
+        try {
+            $deleteQuery = "DELETE FROM sessions WHERE session_token = ?";
+            $deleteStmt = $db->prepare($deleteQuery);
+            $deleteStmt->execute([$token]);
+            error_log("Session deleted successfully for user ID: $userId");
+        } catch (Exception $e) {
+            error_log("Failed to delete session: " . $e->getMessage());
+            // Continue even if session deletion fails
+        }
+    } else {
+        error_log("No valid session found for logout token");
     }
     
     $response = [

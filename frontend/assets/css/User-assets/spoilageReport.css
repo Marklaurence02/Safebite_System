@@ -7,7 +7,6 @@ body {
 }
 
 .spoilage-main {
-  margin-left: 260px;
   padding: 32px 32px 32px 32px;
   min-height: 100vh;
   background: #181f36;
@@ -232,24 +231,26 @@ body {
   box-shadow: 0 2px 12px 0 rgba(0,0,0,0.10);
   padding: 28px 32px 24px 32px;
   margin-top: 24px;
+  width: 100%;
 }
 
 .detailed-report-filters {
   margin-bottom: 32px;
 }
 
+/* Switch filters to grid for consistent alignment */
 .filter-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 16px;
   margin-bottom: 16px;
-  flex-wrap: wrap;
 }
 
 .filter-group {
   display: flex;
   flex-direction: column;
   gap: 6px;
-  min-width: 150px;
+  min-width: 0; /* allow shrinking in grid */
 }
 
 .filter-group label {
@@ -266,6 +267,8 @@ body {
   padding: 8px 12px;
   color: #fff;
   font-size: 0.95em;
+  width: 100%;
+  min-width: 0;
 }
 
 .filter-group input:focus,
@@ -308,6 +311,7 @@ body {
   background: #22336a;
   border-radius: 10px;
   padding: 24px;
+  overflow-x: auto; /* enable horizontal scroll on small screens */
 }
 
 .detailed-report-title {
@@ -321,6 +325,7 @@ body {
   width: 100%;
   border-collapse: collapse;
   font-size: 0.9em;
+  min-width: 720px; /* keep columns readable; scroll when smaller */
 }
 
 .detailed-report-table th {
@@ -370,100 +375,96 @@ body {
   text-transform: uppercase;
 }
 
-.status-badge.spoiled {
-  background: #ff5e5e;
-  color: #fff;
-}
+.status-badge.spoiled { background: #ff5e5e; color: #fff; }
+.status-badge.expired { background: #ff8c42; color: #fff; }
+.status-badge.at-risk { background: #ffe066; color: #333; }
+.status-badge.fresh { background: #4be18a; color: #fff; }
 
-.status-badge.expired {
-  background: #ff8c42;
-  color: #fff;
-}
+.risk-score { font-weight: 600; color: #fff; }
+.risk-score.high { color: #ff5e5e; }
 
-.status-badge.at-risk {
-  background: #ffe066;
-  color: #333;
-}
+.expiry-today { color: #ffe066; font-size: 0.8em; }
+.expiry-expired { color: #ff5e5e; font-size: 0.8em; }
+.expiry-days { color: #4be18a; font-size: 0.8em; }
 
-.status-badge.fresh {
-  background: #4be18a;
-  color: #fff;
-}
+.alert-badge { background: #ff5e5e; color: #fff; padding: 2px 6px; border-radius: 3px; font-size: 0.75em; font-weight: 500; }
+.alert-badge.none { background: #4be18a; color: #fff; }
 
-.risk-score {
-  font-weight: 600;
-  color: #fff;
-}
-
-.risk-score.high {
-  color: #ff5e5e;
-}
-
-.expiry-today {
-  color: #ffe066;
-  font-size: 0.8em;
-}
-
-.expiry-expired {
-  color: #ff5e5e;
-  font-size: 0.8em;
-}
-
-.expiry-days {
-  color: #4be18a;
-  font-size: 0.8em;
-}
-
-.alert-badge {
-  background: #ff5e5e;
-  color: #fff;
-  padding: 2px 6px;
-  border-radius: 3px;
-  font-size: 0.75em;
-  font-weight: 500;
-}
-
-.alert-badge.none {
-  background: #4be18a;
-  color: #fff;
+/* Ensure cards span full width */
+.detailed-report-card,
+.detailed-report-table-card {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* Responsive for detailed report */
 @media (max-width: 1200px) {
   .filter-row {
-    flex-direction: column;
-    gap: 12px;
+    grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   }
-  
-  .filter-group {
-    min-width: auto;
-  }
-  
-  .detailed-report-table {
-    font-size: 0.8em;
-  }
-  
+  .detailed-report-table { font-size: 0.85em; }
   .detailed-report-table th,
-  .detailed-report-table td {
-    padding: 8px 12px;
-  }
+  .detailed-report-table td { padding: 10px 12px; }
+}
+
+@media (max-width: 900px) {
+  .spoilage-main { margin-left: 0; padding: 20px 12px; }
+  .spoilage-header-top { flex-direction: column; gap: 16px; align-items: flex-start; }
 }
 
 @media (max-width: 768px) {
-  .detailed-report-card {
-    padding: 16px;
-  }
-  
-  .detailed-report-table-card {
-    padding: 16px;
-  }
-  
-  .detailed-report-table {
-    font-size: 0.75em;
-  }
-  
-  .detailed-report-table th,
-  .detailed-report-table td {
-    padding: 6px 8px;
-  }
+  .spoilage-main { padding: 16px 12px; }
+  .spoilage-header-top { flex-direction: column; gap: 12px; align-items: stretch; }
+  .spoilage-header-buttons { width: 100%; gap: 8px; }
+  .spoilage-header-buttons .spoilage-btn { flex: 1 1 0; text-align: center; padding: 10px 14px; }
+  .detailed-report-title { font-size: 1.05em; margin-bottom: 14px; }
+  .filter-actions { justify-content: flex-start; flex-wrap: wrap; width: 100%; }
+  /* Force single column to avoid right-side stacking */
+  .filter-row { grid-template-columns: 1fr; gap: 12px; justify-content: start; justify-items: stretch; width: 100%; }
+  .filter-group { width: 100%; }
+  .filter-group input, .filter-group select { width: 100%; }
+  .detailed-report-table { font-size: 0.78em; min-width: 640px; }
+}
+
+@media (max-width: 480px) {
+  .spoilage-main { padding: 12px 8px; }
+  .spoilage-header-top h1 { font-size: 1.6em; }
+  .spoilage-subtitle { font-size: 0.95em; }
+  .filter-row { grid-template-columns: 1fr; gap: 10px; }
+  .filter-actions { gap: 8px; }
+  .filter-actions .filter-btn { width: 100%; padding: 10px 12px; font-size: 0.95em; }
+  .detailed-report-card { padding: 14px; }
+  .detailed-report-table-card { padding: 12px; }
+  .detailed-report-title { font-size: 1em; }
+}
+
+@media (max-width: 360px) {
+  .spoilage-header-buttons { flex-direction: column; }
+  .spoilage-header-buttons .spoilage-btn { width: 100%; }
+  .detailed-report-table { font-size: 0.74em; min-width: 580px; }
+} 
+
+/* Laptop refinements: 1024px–1440px */
+@media (min-width: 1024px) and (max-width: 1440px) {
+  .spoilage-main { padding: 24px 24px; }
+  /* Use three balanced columns for filters at this range */
+  .filter-row { grid-template-columns: repeat(3, minmax(220px, 1fr)); gap: 16px; }
+  .filter-group { min-width: 0; }
+  .detailed-report-card { padding: 24px 28px; }
+  .detailed-report-table-card { padding: 20px 24px; }
+  .detailed-report-title { font-size: 1.15em; }
+  /* Slightly tighter table for medium-large laptops */
+  .detailed-report-table { font-size: 0.88em; min-width: 820px; }
+} 
+
+/* Tablet/Laptop 1024px fixes */
+@media (max-width: 1024px) {
+  .spoilage-main { padding: 20px 16px; }
+  .spoilage-header-top h1 { font-size: 1.9em; }
+  .spoilage-header-buttons { justify-content: flex-start; gap: 10px; }
+  .spoilage-stats-row { flex-wrap: wrap; gap: 16px; }
+  .spoilage-stat-card { flex: 1 1 calc(50% - 16px); min-width: 260px; }
+  .spoilage-main-cards { flex-direction: column; gap: 20px; }
+  .spoilage-bar-card, .spoilage-summary-card { margin: 0; }
 } 
