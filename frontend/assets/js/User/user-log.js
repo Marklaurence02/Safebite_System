@@ -73,7 +73,7 @@ window.initUserLogPage = function() {
       ...filters
     });
     
-    const apiUrl = `../../backend/api/get-user-logs.php?${params.toString()}`;
+    const apiUrl = `../../backend/api/User-api/get-user-logs.php?${params.toString()}`;
     console.log('API URL:', apiUrl);
     
     // Get session token from localStorage

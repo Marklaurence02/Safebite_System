@@ -40,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     exit(0);
 }
 
-require_once '../config/database.php';
+require_once '../../config/database.php';
 
 try {
     // Use the Database class to get connection

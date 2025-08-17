@@ -47,7 +47,7 @@ class SensorDashboard {
         return;
       }
       
-      const response = await fetch('../../backend/api/sensor-data.php?action=get_sensors', {
+      const response = await fetch('../../backend/api/User-api/sensor-data.php?action=get_sensors', {
         headers: {
           'Authorization': `Bearer ${sessionToken}`
         }
@@ -109,7 +109,7 @@ class SensorDashboard {
         return;
       }
       
-      const response = await fetch('../../backend/api/sensor-data.php?action=get_food_items', {
+      const response = await fetch('../../backend/api/User-api/sensor-data.php?action=get_food_items', {
         headers: {
           'Authorization': `Bearer ${sessionToken}`
         }
@@ -154,7 +154,7 @@ class SensorDashboard {
         return;
       }
       
-      const response = await fetch('../../backend/api/sensor-data.php', {
+      const response = await fetch('../../backend/api/User-api/sensor-data.php', {
         headers: {
           'Authorization': `Bearer ${sessionToken}`
         }
@@ -192,7 +192,7 @@ class SensorDashboard {
       }
       
       // Structure the fetch request like the image example
-      const response = await fetch('../../backend/api/sensor-data.php', {
+      const response = await fetch('../../backend/api/User-api/sensor-data.php', {
         headers: {
           'Authorization': `Bearer ${sessionToken}`
         }
@@ -501,7 +501,7 @@ class SensorDashboard {
         return;
       }
       
-      const response = await fetch(`../../backend/api/sensor-data.php?action=get_food_sensors&food_id=${foodId}`, {
+      const response = await fetch(`../../backend/api/User-api/sensor-data.php?action=get_food_sensors&food_id=${foodId}`, {
         headers: {
           'Authorization': `Bearer ${sessionToken}`
         }

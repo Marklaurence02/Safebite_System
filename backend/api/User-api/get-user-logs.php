@@ -5,7 +5,7 @@ header('Access-Control-Allow-Methods: GET');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
 // Include database configuration
-require_once '../config/database.php';
+require_once '../../config/database.php';
 
 // Function to get current user ID and username from session token
 function getCurrentUser($pdo) {
