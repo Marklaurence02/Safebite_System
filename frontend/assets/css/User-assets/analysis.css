@@ -65,7 +65,7 @@
 .analysis-content-row {
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: stretch; /* Changed from flex-start to stretch */
   gap: 32px;
   width: 100%;
   max-width: 1200px;

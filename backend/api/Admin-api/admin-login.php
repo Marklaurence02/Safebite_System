@@ -4,12 +4,12 @@ ini_set('display_errors', 1);
 ini_set('display_startup_errors', 1);
 error_reporting(E_ALL);
 /**
- * Login API Endpoint
- * SafeBite Backend - User Authentication
+ * Admin Login API Endpoint
+ * SafeBite Backend - Admin Authentication
  */
 
-require_once '../config/database.php';
-require_once '../config/auth.php';
+require_once '../../config/database.php';
+require_once '../../config/auth.php';
 
 // Set CORS headers
 Auth::setCORSHeaders();
@@ -53,22 +53,22 @@ try {
         Auth::sendResponse(['error' => 'Database connection failed'], 500);
     }
     
-    // Check if user exists
+    // Check if user exists and is an admin
     $query = "SELECT user_id, first_name, last_name, username, email, password_hash, role, account_status 
               FROM users 
-              WHERE email = ? AND account_status = 'active' AND role = 'User'";
+              WHERE email = ? AND account_status = 'active' AND role = 'Admin'";
     
     $stmt = $db->prepare($query);
     $stmt->execute([$email]);
     $user = $stmt->fetch();
     
     if (!$user) {
-        Auth::sendResponse(['error' => 'Invalid email or password'], 401);
+        Auth::sendResponse(['error' => 'Invalid email or password for admin access'], 401);
     }
     
     // Verify password
     if (!Auth::verifyPassword($password, $user['password_hash'])) {
-        Auth::sendResponse(['error' => 'Invalid email or password'], 401);
+        Auth::sendResponse(['error' => 'Invalid email or password for admin access'], 401);
     }
     
     // Generate session token
@@ -81,12 +81,12 @@ try {
     $sessionStmt->execute([$user['user_id'], $sessionToken, $expiresAt]);
     
     // Log successful login
-    Auth::logActivity($user['user_id'], 'User logged in successfully', $db);
+    Auth::logActivity($user['user_id'], 'Admin logged in successfully', $db);
     
     // Prepare response data
     $response = [
         'success' => true,
-        'message' => 'Login successful',
+        'message' => 'Admin login successful',
         'user' => [
             'user_id' => $user['user_id'],
             'first_name' => $user['first_name'],
@@ -105,7 +105,7 @@ try {
     Auth::sendResponse($response, 200);
     
 } catch (Exception $e) {
-    error_log("Login error: " . $e->getMessage());
+    error_log("Admin Login error: " . $e->getMessage());
     Auth::sendResponse(['error' => 'Internal server error'], 500);
 }
-?> 
+?>

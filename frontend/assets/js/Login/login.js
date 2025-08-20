@@ -1,4 +1,4 @@
-// Authentication App JavaScript
+// Authentication App JavaScript (User specific)
 document.addEventListener('DOMContentLoaded', function() {
     // Global state management (equivalent to React useState)
     let currentView = 'login';
@@ -12,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function() {
     const emailInput = document.getElementById('email');
     const passwordInput = document.getElementById('password');
     const togglePasswordBtn = document.getElementById('togglePassword');
-    const togglePasswordIcon = togglePasswordBtn.querySelector('i');
+    const togglePasswordIcon = togglePasswordBtn ? togglePasswordBtn.querySelector('i') : null;
     const signinBtn = document.querySelector('.signin-btn');
     
     // Signup form elements
@@ -39,13 +39,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const particleCount = 15;
         const container = document.querySelector('.App');
         
-        for (let i = 0; i < particleCount; i++) {
-            const particle = document.createElement('div');
-            particle.className = 'particle';
-            particle.style.left = Math.random() * 100 + '%';
-            particle.style.animationDelay = Math.random() * 15 + 's';
-            particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
-            container.appendChild(particle);
+        if (container) {
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.animationDelay = Math.random() * 15 + 's';
+                particle.style.animationDuration = (Math.random() * 10 + 10) + 's';
+                container.appendChild(particle);
+            }
         }
     }
 
@@ -106,8 +108,10 @@ document.addEventListener('DOMContentLoaded', function() {
         const passwordToggles = document.querySelectorAll('.toggle-password');
         passwordToggles.forEach(toggle => {
             const icon = toggle.querySelector('i');
-            icon.classList.remove('fa-eye-slash');
-            icon.classList.add('fa-eye');
+            if (icon) {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
         });
         
         const passwordInputs = document.querySelectorAll('input[type="password"]');
@@ -120,6 +124,10 @@ document.addEventListener('DOMContentLoaded', function() {
     function setupPasswordToggle(buttonId, inputId) {
         const button = document.getElementById(buttonId);
         const input = document.getElementById(inputId);
+        if (!button || !input) {
+            console.warn(`Password toggle elements not found for button: ${buttonId}, input: ${inputId}`);
+            return;
+        }
         const icon = button.querySelector('i');
         
         button.addEventListener('click', function() {
@@ -129,14 +137,23 @@ document.addEventListener('DOMContentLoaded', function() {
             if (type === 'text') {
                 icon.classList.remove('fa-eye');
                 icon.classList.add('fa-eye-slash');
-            } 
+            } else {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+            }
         });
     }
 
-    // Setup password toggles
-    setupPasswordToggle('togglePassword', 'password');
-    setupPasswordToggle('toggleSignupPassword', 'signupPassword');
-    setupPasswordToggle('toggleConfirmPassword', 'confirmPassword');
+    // Setup password toggles conditionally, as not all elements exist on every auth page
+    if (togglePasswordBtn) {
+        setupPasswordToggle('togglePassword', 'password');
+    }
+    if (toggleSignupPasswordBtn) {
+        setupPasswordToggle('toggleSignupPassword', 'signupPassword');
+    }
+    if (toggleConfirmPasswordBtn) {
+        setupPasswordToggle('toggleConfirmPassword', 'confirmPassword');
+    }
 
     // Form validation functions
     function validateEmail(email) {
@@ -154,6 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function showError(input, message) {
         const inputField = input.closest('.input-field');
+        if (!inputField) return;
         inputField.classList.add('error');
         
         // Remove existing error message if any
@@ -171,6 +189,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function clearError(input) {
         const inputField = input.closest('.input-field');
+        if (!inputField) return;
         inputField.classList.remove('error');
         
         const errorMessage = inputField.parentNode.querySelector('.error-message');
@@ -180,61 +199,73 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Real-time validation for login form
-    emailInput.addEventListener('blur', function() {
-        const email = this.value.trim();
-        if (email && !validateEmail(email)) {
-            showError(this, 'Please enter a valid email address');
-        } else {
-            clearError(this);
-        }
-    });
+    if (emailInput) {
+        emailInput.addEventListener('blur', function() {
+            const email = this.value.trim();
+            if (email && !validateEmail(email)) {
+                showError(this, 'Please enter a valid email address');
+            } else {
+                clearError(this);
+            }
+        });
+    }
 
-    passwordInput.addEventListener('blur', function() {
-        const password = this.value;
-        if (password && !validatePassword(password)) {
-            showError(this, 'Password must be at least 6 characters long');
-        } else {
-            clearError(this);
-        }
-    });
+    if (passwordInput) {
+        passwordInput.addEventListener('blur', function() {
+            const password = this.value;
+            if (password && !validatePassword(password)) {
+                showError(this, 'Password must be at least 6 characters long');
+            } else {
+                clearError(this);
+            }
+        });
+    }
 
     // Real-time validation for signup form
-    signupNameInput.addEventListener('blur', function() {
-        const name = this.value.trim();
-        if (name && !validateName(name)) {
-            showError(this, 'Name must be at least 2 characters long');
-        } else {
-            clearError(this);
-        }
-    });
+    if (signupNameInput) {
+        signupNameInput.addEventListener('blur', function() {
+            const name = this.value.trim();
+            if (name && !validateName(name)) {
+                showError(this, 'Name must be at least 2 characters long');
+            } else {
+                clearError(this);
+            }
+        });
+    }
 
-    signupEmailInput.addEventListener('blur', function() {
-        const email = this.value.trim();
-        if (email && !validateEmail(email)) {
-            showError(this, 'Please enter a valid email address');
-        } else {
-            clearError(this);
-        }
-    });
+    if (signupEmailInput) {
+        signupEmailInput.addEventListener('blur', function() {
+            const email = this.value.trim();
+            if (email && !validateEmail(email)) {
+                showError(this, 'Please enter a valid email address');
+            } else {
+                clearError(this);
+            }
+        });
+    }
 
-    signupPasswordInput.addEventListener('blur', function() {
-        const password = this.value;
-        if (password && !validatePassword(password)) {
-            showError(this, 'Password must be at least 6 characters long');
-        } else {
-            clearError(this);
-        }
-    });
+    if (signupPasswordInput) {
+        signupPasswordInput.addEventListener('blur', function() {
+            const password = this.value;
+            if (password && !validatePassword(password)) {
+                showError(this, 'Password must be at least 6 characters long');
+            } else {
+                clearError(this);
+            }
+        });
+    }
 
-    confirmPasswordInput.addEventListener('blur', function() {
-        const password = signupPasswordInput.value;
-        const confirmPassword = this.value;
-        if (confirmPassword && password !== confirmPassword) {
-            showError(this, 'Passwords do not match');
-        } else {
-            clearError(this);
-        }
-    });
+    if (confirmPasswordInput) {
+        confirmPasswordInput.addEventListener('blur', function() {
+            const password = signupPasswordInput.value;
+            const confirmPassword = this.value;
+            if (confirmPassword && password !== confirmPassword) {
+                showError(this, 'Passwords do not match');
+            } else {
+                clearError(this);
+            }
+        });
+    }
 
     // Clear errors on input
     document.querySelectorAll('input').forEach(input => {
@@ -246,167 +277,184 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Login form submission
-    loginForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const email = emailInput.value.trim();
-        const password = passwordInput.value;
-        
-        // Clear previous errors
-        clearError(emailInput);
-        clearError(passwordInput);
-        
-        // Validate form
-        let isValid = true;
-        
-        if (!email) {
-            showError(emailInput, 'Email or username is required');
-            isValid = false;
-        } else if (!validateEmail(email)) {
-            showError(emailInput, 'Please enter a valid email address');
-            isValid = false;
-        }
-        
-        if (!password) {
-            showError(passwordInput, 'Password is required');
-            isValid = false;
-        } else if (!validatePassword(password)) {
-            showError(passwordInput, 'Password must be at least 6 characters long');
-            isValid = false;
-        }
-        
-        if (!isValid) return;
-        
-        // Show loading state
-        const submitBtn = this.querySelector('.signin-btn');
-        submitBtn.classList.add('loading');
-        submitBtn.querySelector('span').textContent = 'Signing In...';
-        
-        try {
-            // Perform real login with PHP backend
-            await performLogin(email, password);
-        } catch (error) {
-            console.error('Login error:', error);
-        } finally {
-            // Reset button state
-            submitBtn.classList.remove('loading');
-            submitBtn.querySelector('span').textContent = 'Sign In';
-        }
-    });
+    if (loginForm) {
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = emailInput.value.trim();
+            const password = passwordInput.value;
+            
+            // Clear previous errors
+            clearError(emailInput);
+            clearError(passwordInput);
+            
+            // Validate form
+            let isValid = true;
+            
+            if (!email) {
+                showError(emailInput, 'Email or username is required');
+                isValid = false;
+            } else if (!validateEmail(email)) {
+                showError(emailInput, 'Please enter a valid email address');
+                isValid = false;
+            }
+            
+            if (!password) {
+                showError(passwordInput, 'Password is required');
+                isValid = false;
+            } else if (!validatePassword(password)) {
+                showError(passwordInput, 'Password must be at least 6 characters long');
+                isValid = false;
+            }
+            
+            if (!isValid) return;
+            
+            // Show loading state
+            const submitBtn = this.querySelector('.signin-btn');
+            if (submitBtn) {
+                submitBtn.classList.add('loading');
+                submitBtn.querySelector('span').textContent = 'Signing In...';
+            }
+            
+            try {
+                // Perform user login with PHP backend
+                await performUserLogin(email, password);
+            } catch (error) {
+                console.error('User Login error:', error);
+            } finally {
+                // Reset button state
+                if (submitBtn) {
+                    submitBtn.classList.remove('loading');
+                    submitBtn.querySelector('span').textContent = 'Sign In';
+                }
+            }
+        });
+    }
 
     // Signup form submission
-    signupForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const name = signupNameInput.value.trim();
-        const email = signupEmailInput.value.trim();
-        const password = signupPasswordInput.value;
-        const confirmPassword = confirmPasswordInput.value;
-        
-        // Clear previous errors
-        clearError(signupNameInput);
-        clearError(signupEmailInput);
-        clearError(signupPasswordInput);
-        clearError(confirmPasswordInput);
-        
-        // Validate form
-        let isValid = true;
-        
-        if (!name) {
-            showError(signupNameInput, 'Full name is required');
-            isValid = false;
-        } else if (!validateName(name)) {
-            showError(signupNameInput, 'Name must be at least 2 characters long');
-            isValid = false;
-        }
-        
-        if (!email) {
-            showError(signupEmailInput, 'Email is required');
-            isValid = false;
-        } else if (!validateEmail(email)) {
-            showError(signupEmailInput, 'Please enter a valid email address');
-            isValid = false;
-        }
-        
-        if (!password) {
-            showError(signupPasswordInput, 'Password is required');
-            isValid = false;
-        } else if (!validatePassword(password)) {
-            showError(signupPasswordInput, 'Password must be at least 6 characters long');
-            isValid = false;
-        }
-        
-        if (!confirmPassword) {
-            showError(confirmPasswordInput, 'Please confirm your password');
-            isValid = false;
-        } else if (password !== confirmPassword) {
-            showError(confirmPasswordInput, 'Passwords do not match');
-            isValid = false;
-        }
-        
-        if (!isValid) return;
-        
-        // Show loading state
-        const submitBtn = this.querySelector('.signin-btn');
-        submitBtn.classList.add('loading');
-        submitBtn.querySelector('span').textContent = 'Creating Account...';
-        
-        try {
-            // Perform real signup with PHP backend
-            await performSignup(name, email, password);
-        } catch (error) {
-            console.error('Signup error:', error);
-        } finally {
-            // Reset button state
+    if (signupForm) {
+        signupForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const name = signupNameInput.value.trim();
+            const email = signupEmailInput.value.trim();
+            const password = signupPasswordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            // Clear previous errors
+            clearError(signupNameInput);
+            clearError(signupEmailInput);
+            clearError(signupPasswordInput);
+            clearError(confirmPasswordInput);
+            
+            // Validate form
+            let isValid = true;
+            
+            if (!name) {
+                showError(signupNameInput, 'Full name is required');
+                isValid = false;
+            } else if (!validateName(name)) {
+                showError(signupNameInput, 'Name must be at least 2 characters long');
+                isValid = false;
+            }
+            
+            if (!email) {
+                showError(signupEmailInput, 'Email is required');
+                isValid = false;
+            } else if (!validateEmail(email)) {
+                showError(signupEmailInput, 'Please enter a valid email address');
+                isValid = false;
+            }
+            
+            if (!password) {
+                showError(signupPasswordInput, 'Password is required');
+                isValid = false;
+            } else if (!validatePassword(password)) {
+                showError(signupPasswordInput, 'Password must be at least 6 characters long');
+                isValid = false;
+            }
+            
+            if (!confirmPassword) {
+                showError(confirmPasswordInput, 'Please confirm your password');
+                isValid = false;
+            } else if (password !== confirmPassword) {
+                showError(confirmPasswordInput, 'Passwords do not match');
+                isValid = false;
+            }
+            
+            if (!isValid) return;
+            
+            // Show loading state
             const submitBtn = this.querySelector('.signin-btn');
-            submitBtn.classList.remove('loading');
-            submitBtn.querySelector('span').textContent = 'Create Account';
-        }
-    });
+            if (submitBtn) {
+                submitBtn.classList.add('loading');
+                submitBtn.querySelector('span').textContent = 'Creating Account...';
+            }
+            
+            try {
+                // Perform user signup with PHP backend
+                await performSignup(name, email, password);
+            } catch (error) {
+                console.error('User Signup error:', error);
+            } finally {
+                // Reset button state
+                const submitBtn = this.querySelector('.signin-btn');
+                if (submitBtn) {
+                    submitBtn.classList.remove('loading');
+                    submitBtn.querySelector('span').textContent = 'Create Account';
+                }
+            }
+        });
+    }
 
     // Forgot password form submission
-    forgotForm.addEventListener('submit', async function(e) {
-        e.preventDefault();
-        
-        const email = forgotEmailInput.value.trim();
-        
-        // Clear previous errors
-        clearError(forgotEmailInput);
-        
-        // Validate form
-        if (!email) {
-            showError(forgotEmailInput, 'Email is required');
-            return;
-        } else if (!validateEmail(email)) {
-            showError(forgotEmailInput, 'Please enter a valid email address');
-            return;
-        }
-        
-        // Show loading state
-        const submitBtn = this.querySelector('.signin-btn');
-        submitBtn.classList.add('loading');
-        submitBtn.querySelector('span').textContent = 'Sending Reset...';
-        
-        try {
-            // Perform real password reset with PHP backend
-            await performPasswordReset(email);
-        } catch (error) {
-            console.error('Password reset error:', error);
-        } finally {
-            // Reset button state
+    if (forgotForm) {
+        forgotForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = forgotEmailInput.value.trim();
+            
+            // Clear previous errors
+            clearError(forgotEmailInput);
+            
+            // Validate form
+            if (!email) {
+                showError(forgotEmailInput, 'Email is required');
+                return;
+            } else if (!validateEmail(email)) {
+                showError(forgotEmailInput, 'Please enter a valid email address');
+                return;
+            }
+            
+            // Show loading state
             const submitBtn = this.querySelector('.signin-btn');
-            submitBtn.classList.remove('loading');
-            submitBtn.querySelector('span').textContent = 'Reset Password';
-        }
-    });
+            if (submitBtn) {
+                submitBtn.classList.add('loading');
+                submitBtn.querySelector('span').textContent = 'Sending Reset...';
+            }
+            
+            try {
+                // Perform user password reset with PHP backend
+                await performPasswordReset(email);
+            } catch (error) {
+                console.error('User Password reset error:', error);
+            } finally {
+                // Reset button state
+                const submitBtn = this.querySelector('.signin-btn');
+                if (submitBtn) {
+                    submitBtn.classList.remove('loading');
+                    submitBtn.querySelector('span').textContent = 'Reset Password';
+                }
+            }
+        });
+    }
 
-    // Real login process with PHP backend
-    async function performLogin(email, password) {
+    // Real user login process with PHP backend
+    async function performUserLogin(email, password) {
         try {
-            // Force XAMPP path for backend
             const apiUrl = 'http://localhost/SafeBite/backend/api/login.php';
             
-            console.log('Attempting login to:', apiUrl);
+            console.log('Attempting user login to:', apiUrl);
             
             const response = await fetch(apiUrl, {
                 method: 'POST',
@@ -423,7 +471,8 @@ document.addEventListener('DOMContentLoaded', function() {
             try {
                 data = await response.json();
             } catch (jsonErr) {
-                data = {};
+                data = { success: false, error: 'Invalid response from server. Check server logs.' };
+                console.error('JSON parsing error (User Login):', jsonErr, 'Response:', response.status, response.statusText);
             }
 
             if (response.ok && data.success) {
@@ -434,30 +483,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 
                 showToast(`Welcome back, ${data.user.full_name}! Redirecting...`, 'success');
                 
-                // Redirect to appropriate dashboard after a short delay
                 setTimeout(() => {
-                    if (data.user.role && data.user.role.toLowerCase() === 'admin') {
-                        window.location.href = '../pages/ad-dashboard..html';
-                    } else {
-                        window.location.href = '../pages/User-Dashboard.html';
-                    }
+                    window.location.href = '../pages/User-Dashboard.html'; // User dashboard
                 }, 1000);
             } else {
                 // Show backend error message if present
-                showToast(data.error || 'Login failed. Please try again.', 'error');
+                showToast(data.error || 'User login failed. Please try again.', 'error');
             }
         } catch (error) {
-            console.error('Login error:', error);
+            console.error('User Login fetch error:', error);
             // Provide more specific error messages
             if (error.message && error.message.includes('Failed to fetch')) {
                 showToast('Cannot connect to server. Make sure XAMPP is running and you\'re accessing via http://localhost', 'error');
             } else {
-                showToast('Network or server error. Please try again.', 'error');
+                showToast('Network or server error during user login. Please try again.', 'error');
             }
         }
     }
-
-
 
     // Real signup process with PHP backend
     async function performSignup(name, email, password) {
@@ -496,7 +538,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 showToast(`Account created successfully for ${data.user.full_name}! Please sign in.`, 'success');
                 
-                // Switch to login view after a short delay
                 setTimeout(() => {
                     handleNavigation('login');
                 }, 2000);
@@ -504,9 +545,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 showToast(data.error || 'Registration failed. Please try again.', 'error');
             }
         } catch (error) {
-            console.error('Signup error:', error);
+            console.error('User Signup error:', error);
             
-            // Provide more specific error messages
             if (error.message.includes('Failed to fetch')) {
                 showToast('Cannot connect to server. Make sure XAMPP is running and you\'re accessing via http://localhost', 'error');
             } else if (error.message.includes('HTTP error')) {
@@ -545,7 +585,6 @@ document.addEventListener('DOMContentLoaded', function() {
             if (data.success) {
                 showToast(data.message, 'info');
                 
-                // Switch to login view after a short delay
                 setTimeout(() => {
                     handleNavigation('login');
                 }, 2000);
@@ -553,9 +592,8 @@ document.addEventListener('DOMContentLoaded', function() {
                 showToast(data.error || 'Password reset failed. Please try again.', 'error');
             }
         } catch (error) {
-            console.error('Password reset error:', error);
+            console.error('User Password reset error:', error);
             
-            // Provide more specific error messages
             if (error.message.includes('Failed to fetch')) {
                 showToast('Cannot connect to server. Make sure XAMPP is running and you\'re accessing via http://localhost', 'error');
             } else if (error.message.includes('HTTP error')) {
@@ -568,6 +606,12 @@ document.addEventListener('DOMContentLoaded', function() {
 
     // Toast notification system (equivalent to React Toaster)
     function showToast(message, type = 'info') {
+        if (!toaster) {
+            console.warn('Toaster element not found. Message:', message);
+            alert(message); // Fallback to alert if toaster is not present
+            return;
+        }
+
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         
@@ -610,14 +654,16 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     // Focus management
-    emailInput.focus();
+    if (emailInput) emailInput.focus();
     
     // Auto-focus password field when email is entered
-    emailInput.addEventListener('keydown', function(e) {
-        if (e.key === 'Enter' && this.value.trim()) {
-            passwordInput.focus();
-        }
-    });
+    if (emailInput && passwordInput) {
+        emailInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && this.value.trim()) {
+                passwordInput.focus();
+            }
+        });
+    }
 
     // Add some interactive effects
     const inputs = document.querySelectorAll('input');
@@ -634,5 +680,5 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize particle effects
     createParticles();
 
-    console.log('Authentication app initialized successfully');
+    console.log('User Authentication app initialized successfully');
 }); 
