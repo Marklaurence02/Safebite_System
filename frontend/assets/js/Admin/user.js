@@ -1,60 +1,273 @@
 // js/user.js
 
-// Mock user data
-let users = [
-  { id: 1, name: 'Alice Johnson', email: 'alice@example.com', status: 'Active', dateCreated: '2025-06-01', password: 'alicepass' },
-  { id: 2, name: 'Bob Smith', email: 'bob@example.com', status: 'Active', dateCreated: '2025-06-02', password: 'bobpass' },
-  { id: 3, name: 'Carol Lee', email: 'carol@example.com', status: 'Inactive', dateCreated: '2025-06-03', password: 'carolpass' },
-  { id: 4, name: 'David Kim', email: 'david@example.com', status: 'Active', dateCreated: '2025-06-04', password: 'davidpass' }
-];
-let editingUserId = null;
+// Global variables for user data
+let usersData = [];
+let currentUserPage = 1;
+let userRecordsPerPage = 25;
+let totalUserRecords = 0;
+let currentUserFilters = {
+  search: '',
+  role: '',
+  status: '',
+  dateStart: '',
+  dateEnd: ''
+};
 
-// Admin password for demo
-const ADMIN_PASSWORD = '123456789';
-let pendingUserAction = null; // {type: 'add'|'edit', user: {}}
+// Function to get current admin user info from session
+function getCurrentAdminInfo() {
+  const sessionToken = localStorage.getItem('sessionToken');
+  const currentUser = localStorage.getItem('currentUser');
+  
+  if (sessionToken && currentUser) {
+    try {
+      return JSON.parse(currentUser);
+    } catch (e) {
+      console.error('Error parsing current user:', e);
+      return null;
+    }
+  }
+  return null;
+}
+
+// Function to prompt for admin password using the logged-in user's info
+function promptForAdminPassword(action) {
+  const adminInfo = getCurrentAdminInfo();
+  if (!adminInfo) {
+    alert('Admin session not found. Please log in again.');
+    return null;
+  }
+  
+  const promptMessage = `Enter password for ${adminInfo.username || 'admin'} to ${action}:`;
+  return window.prompt(promptMessage);
+}
+
+// Function to verify admin password
+async function verifyAdminPassword(password) {
+  if (!password) return false;
+  
+  try {
+    const sessionToken = localStorage.getItem('sessionToken');
+    const response = await fetch('../../backend/api/Admin-api/verify-admin-password.php', {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${sessionToken}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ password: password })
+    });
+    
+    if (response.ok) {
+      const result = await response.json();
+      return result.success === true;
+    }
+  } catch (error) {
+    console.error('Error verifying password:', error);
+  }
+  
+  return false;
+}
+
+// Function to fetch users from API
+async function fetchUsers(page = 1, limit = 25) {
+  try {
+    // Get current filters
+    const search = document.getElementById('userSearch')?.value || '';
+    const role = document.getElementById('userRoleFilter')?.value || '';
+    const status = document.getElementById('userStatusFilter')?.value || '';
+    const dateStart = document.getElementById('userDateStart')?.value || '';
+    const dateEnd = document.getElementById('userDateEnd')?.value || '';
+    
+    // Build query parameters
+    const params = new URLSearchParams({
+      page: page,
+      limit: limit,
+      search: search,
+      role: role,
+      status: status,
+      date_start: dateStart,
+      date_end: dateEnd
+    });
+    
+    // Get session token from localStorage
+    const sessionToken = localStorage.getItem('sessionToken');
+    
+    const response = await fetch(`../../backend/api/Admin-api/get-users.php?${params}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': `Bearer ${sessionToken}`,
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    
+    if (result.success) {
+      usersData = result.data;
+      totalUserRecords = result.pagination.total_records;
+      currentUserPage = result.pagination.current_page;
+      userRecordsPerPage = result.pagination.records_per_page;
+      
+      // Update current filters
+      currentUserFilters = {
+        search: result.filters.search,
+        role: result.filters.role,
+        status: result.filters.status,
+        dateStart: result.filters.date_start,
+        dateEnd: result.filters.date_end
+      };
+      
+      renderUserTable();
+      renderUserPagination(totalUserRecords);
+    } else {
+      console.error('API Error:', result.error);
+      usersData = [];
+      totalUserRecords = 0;
+      renderUserTable();
+    }
+  } catch (error) {
+    console.error('Error fetching users:', error);
+    usersData = [];
+    totalUserRecords = 0;
+    renderUserTable();
+  }
+}
 
 function renderUserTable() {
   const tbody = document.getElementById('userTableBody');
-  if (!tbody) return;
-  const search = document.getElementById('userSearch').value.toLowerCase();
-  const status = document.getElementById('userStatusFilter').value;
-  const dateStart = document.getElementById('userDateStart').value;
-  const dateEnd = document.getElementById('userDateEnd').value;
-  let filtered = users.filter(u => {
-    let match = true;
-    if (search) {
-      match = u.name.toLowerCase().includes(search) || u.email.toLowerCase().includes(search);
-    }
-    if (match && status) {
-      match = u.status === status;
-    }
-    if (match && dateStart) {
-      match = u.dateCreated >= dateStart;
-    }
-    if (match && dateEnd) {
-      match = u.dateCreated <= dateEnd;
-    }
-    return match;
-  });
-  tbody.innerHTML = filtered.length === 0
-    ? `<tr><td colspan="5" style="text-align:center;color:#888;padding:32px;">No users found.</td></tr>`
-    : filtered.map(u => `
-      <tr>
-        <td>${u.name}</td>
-        <td>${u.email}</td>
-        <td>${u.dateCreated}</td>
-        <td>${u.status}</td>
-        <td>
-          <button class="action-btn edit" data-id="${u.id}">Edit</button>
-          <button class="action-btn delete" data-id="${u.id}">Delete</button>
+  if (!tbody) {
+    return;
+  }
+  
+  if (usersData.length === 0) {
+    tbody.innerHTML = `<tr><td colspan="6" class="empty-state">
+      <div class="empty-state-content">
+        <div class="empty-state-icon">👥</div>
+        <div class="empty-state-title">No Users Found</div>
+        <div class="empty-state-desc">Try adjusting your filters or add a new user.</div>
+      </div>
+    </td></tr>`;
+    return;
+  }
+  
+  // Data is already paginated from the API
+  tbody.innerHTML = usersData.map(user => `
+    <tr>
+      <td>${user.name}</td>
+      <td>${user.email}</td>
+      <td><span class="role-badge role-${user.role.toLowerCase()}">${user.role}</span></td>
+      <td>${formatDate(user.date_created)}</td>
+      <td><span class="status-badge status-${user.status.toLowerCase()}">${user.status}</span></td>
+      <td>
+        <button class="action-btn edit" data-id="${user.user_id}">Edit</button>
+        <button class="action-btn delete" data-id="${user.user_id}">Delete</button>
         </td>
       </tr>
     `).join('');
 }
 
-function handleUserFilters() {
-  renderUserTable();
+function renderUserPagination(totalRecords) {
+  const paginationDiv = document.getElementById('userPagination');
+  if (!paginationDiv) return;
+  
+  const totalPages = Math.ceil(totalRecords / userRecordsPerPage);
+  
+  if (totalPages <= 1) {
+    paginationDiv.innerHTML = '';
+    return;
+  }
+  
+  let paginationHTML = '<div class="pagination-info">';
+  paginationHTML += `Showing ${((currentUserPage - 1) * userRecordsPerPage) + 1} to ${Math.min(currentUserPage * userRecordsPerPage, totalRecords)} of ${totalRecords} users`;
+  paginationHTML += '</div>';
+  
+  paginationHTML += '<div class="pagination-controls">';
+  
+  // Previous button
+  if (currentUserPage > 1) {
+    paginationHTML += `<button class="pagination-btn" onclick="changeUserPage(${currentUserPage - 1})">‹ Previous</button>`;
+  }
+  
+  // Page numbers
+  for (let i = 1; i <= totalPages; i++) {
+    if (i === currentUserPage) {
+      paginationHTML += `<button class="pagination-btn active">${i}</button>`;
+    } else if (i === 1 || i === totalPages || (i >= currentUserPage - 2 && i <= currentUserPage + 2)) {
+      paginationHTML += `<button class="pagination-btn" onclick="changeUserPage(${i})">${i}</button>`;
+    } else if (i === currentUserPage - 3 || i === currentUserPage + 3) {
+      paginationHTML += `<span class="pagination-ellipsis">...</span>`;
+    }
+  }
+  
+  // Next button
+  if (currentUserPage < totalPages) {
+    paginationHTML += `<button class="pagination-btn" onclick="changeUserPage(${currentUserPage + 1})">Next ›</button>`;
+  }
+  
+  paginationHTML += '</div>';
+  paginationDiv.innerHTML = paginationHTML;
 }
+
+function changeUserPage(page) {
+  currentUserPage = page;
+  fetchUsers(page, userRecordsPerPage);
+}
+
+function changeUserRecordsPerPage(recordsPerPage) {
+  userRecordsPerPage = parseInt(recordsPerPage);
+  currentUserPage = 1;
+  fetchUsers(1, recordsPerPage);
+}
+
+function handleUserFilters() {
+  currentUserPage = 1;
+  fetchUsers(1, userRecordsPerPage);
+}
+
+// Add event listeners for filters
+document.addEventListener('DOMContentLoaded', function() {
+  // Add filter event listeners
+  const searchInput = document.getElementById('userSearch');
+  const statusFilter = document.getElementById('userStatusFilter');
+  const roleFilter = document.getElementById('userRoleFilter');
+  const dateStartInput = document.getElementById('userDateStart');
+  const dateEndInput = document.getElementById('userDateEnd');
+  
+  if (searchInput) searchInput.addEventListener('input', debounce(handleUserFilters, 300));
+  if (statusFilter) statusFilter.addEventListener('change', handleUserFilters);
+  if (roleFilter) roleFilter.addEventListener('change', handleUserFilters);
+  if (dateStartInput) dateStartInput.addEventListener('change', handleUserFilters);
+  if (dateEndInput) dateEndInput.addEventListener('change', handleUserFilters);
+});
+
+// Debounce function to limit API calls
+function debounce(func, wait) {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+}
+
+// Function to format date for display
+function formatDate(dateString) {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+}
+
+// Mock user data for editing (since we don't have full user details from the list API)
+let editingUserId = null;
 
 function openUserModal(editUser) {
   const modal = document.getElementById('userModal');
@@ -62,39 +275,32 @@ function openUserModal(editUser) {
   document.getElementById('userModalTitle').textContent = editUser ? 'Edit User' : 'Add User';
   form.reset();
   editingUserId = null;
+  
   // Show/hide password fields
   const passwordGroups = form.querySelectorAll('.password-group');
   const passwordInput = form.querySelector('#userPassword');
-  const currentPasswordInput = form.querySelector('#userCurrentPassword');
-  const currentPasswordLabel = form.querySelector('#userCurrentPasswordLabel');
+  
   if (editUser) {
-    editingUserId = editUser.id;
-    document.getElementById('userId').value = editUser.id;
+    editingUserId = editUser.user_id;
+    document.getElementById('userId').value = editUser.user_id;
     document.getElementById('userName').value = editUser.name;
     document.getElementById('userEmail').value = editUser.email;
     document.getElementById('userStatus').value = editUser.status;
-    document.getElementById('userDateCreated').value = editUser.dateCreated;
+    document.getElementById('userDateCreated').value = editUser.date_created;
+    
     // Show both password groups
     passwordGroups.forEach(g => g.style.display = '');
     if (passwordInput) passwordInput.required = false;
-    setTimeout(() => {
-      if (currentPasswordInput && currentPasswordLabel) {
-        currentPasswordInput.style.display = '';
-        currentPasswordLabel.style.display = '';
-        currentPasswordInput.value = editUser.password || '';
-      }
-    }, 0);
+    
+
   } else {
     document.getElementById('userDateCreated').value = new Date().toISOString().slice(0, 10);
+    
     // Only show new password group
     passwordGroups.forEach(g => g.style.display = '');
-    if (currentPasswordInput && currentPasswordLabel) {
-      currentPasswordInput.style.display = 'none';
-      currentPasswordLabel.style.display = 'none';
-      currentPasswordInput.value = '';
-    }
     if (passwordInput) passwordInput.required = true;
   }
+  
   if (passwordInput) passwordInput.value = '';
   modal.style.display = 'flex';
 }
@@ -113,106 +319,161 @@ function handleUserFormSubmit(e) {
   const dateCreated = document.getElementById('userDateCreated').value;
   const passwordInput = document.getElementById('userPassword');
   const password = passwordInput ? passwordInput.value : '';
-  let changedFields = [];
-  let oldUser = users.find(u => u.id === editingUserId);
-  if (editingUserId) {
-    // Edit
-    users = users.map(u => {
-      if (u.id === editingUserId) {
-        const updated = { id: editingUserId, name, email, status, dateCreated };
-        if (password) updated.password = password;
-        else if (u.password) updated.password = u.password;
-        // Track changes
-        if (oldUser) {
-          if (oldUser.email !== email) changedFields.push('email');
-          if (password && oldUser.password !== password) changedFields.push('password');
-          if (oldUser.name !== name) changedFields.push('name');
-          if (oldUser.status !== status) changedFields.push('status');
-        }
-        return updated;
-      }
-      return u;
-    });
-    // Log to activity log if any changes
-    if (typeof window.addActivityLogEntry === 'function' && changedFields.length > 0) {
-      const details = `Updated: ${changedFields.join(', ')} at ${new Date().toLocaleString()}`;
-      window.addActivityLogEntry({ user: name, type: 'edit', details });
-    }
-  } else {
-    // Add
-    const newId = users.length ? Math.max(...users.map(u => u.id)) + 1 : 1;
-    const newUser = { id: newId, name, email, status, dateCreated };
-    if (password) newUser.password = password;
-    users.push(newUser);
-    // Log add
-    if (typeof window.addActivityLogEntry === 'function') {
-      window.addActivityLogEntry({ user: name, type: 'add', details: `User created at ${new Date().toLocaleString()}` });
-    }
-  }
-  renderUserTable();
+  
+  // For now, just close the modal and refresh the data
+  // In a real implementation, you would make an API call to create/update the user
+  console.log('User form submitted:', { id, name, email, status, dateCreated, password });
+  
   closeUserModal();
+  
+  // Refresh the user list
+  fetchUsers(currentUserPage, userRecordsPerPage);
 }
 
-// Remove admin password modal logic. Use prompt instead.
-// Remove showAdminPassModal, closeAdminPassModal, handleAdminPassFormSubmit, patchedAddUserBtn, patchedEditUserBtn.
-// Patch add/edit triggers to use prompt.
-function addUserWithAdminPass() {
-  const pass = window.prompt('Enter admin password to proceed:');
-  if (pass === ADMIN_PASSWORD) {
+// Admin password functions using logged-in user's password
+async function addUserWithAdminPass() {
+  const password = promptForAdminPassword('add a new user');
+  if (password === null) return; // User cancelled
+  
+  const isValid = await verifyAdminPassword(password);
+  if (isValid) {
     openUserModal();
     const nameInput = document.getElementById('userName');
     if (nameInput) nameInput.focus();
-  } else if (pass !== null) {
+  } else {
     alert('Incorrect password.');
   }
 }
-function editUserWithAdminPass(user) {
-  const pass = window.prompt('Enter admin password to proceed:');
-  if (pass === ADMIN_PASSWORD) {
-    openUserModal(user);
+
+async function editUserWithAdminPass(user) {
+  const password = promptForAdminPassword('edit this user');
+  if (password === null) return; // User cancelled
+  
+  const isValid = await verifyAdminPassword(password);
+  if (isValid) {
+    // Fetch full user details including password
+    try {
+      const sessionToken = localStorage.getItem('sessionToken');
+      const response = await fetch(`../../backend/api/Admin-api/get-user-details.php?user_id=${user.user_id}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${sessionToken}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          openUserModal(result.data);
+        } else {
+          console.error('Error fetching user details:', result.error);
+          openUserModal(user); // Fallback to basic user data
+        }
+      } else {
+        console.error('Error fetching user details:', response.status);
+        openUserModal(user); // Fallback to basic user data
+      }
+    } catch (error) {
+      console.error('Error fetching user details:', error);
+      openUserModal(user); // Fallback to basic user data
+    }
+    
     const nameInput = document.getElementById('userName');
     if (nameInput) nameInput.focus();
-  } else if (pass !== null) {
+  } else {
+    alert('Incorrect password.');
+  }
+}
+
+async function deleteUserWithAdminPass(userId) {
+  const password = promptForAdminPassword('delete this user');
+  if (password === null) return; // User cancelled
+  
+  const isValid = await verifyAdminPassword(password);
+  if (isValid) {
+    if (confirm('Delete this user?')) {
+      // In a real implementation, you would make an API call to delete the user
+      console.log('Deleting user:', userId);
+      
+      // Refresh the user list
+      fetchUsers(currentUserPage, userRecordsPerPage);
+    }
+  } else {
     alert('Incorrect password.');
   }
 }
 
 function initUserManager() {
-  renderUserTable();
-  document.getElementById('addUserBtn').onclick = addUserWithAdminPass;
-  document.getElementById('cancelUserBtn').onclick = closeUserModal;
-  document.getElementById('userForm').onsubmit = handleUserFormSubmit;
-  document.getElementById('userTableBody').onclick = function(e) {
+  // Set up event listeners
+  const addUserBtn = document.getElementById('addUserBtn');
+  const cancelUserBtn = document.getElementById('cancelUserBtn');
+  const userForm = document.getElementById('userForm');
+  const userTableBody = document.getElementById('userTableBody');
+  const userSearch = document.getElementById('userSearch');
+  const userStatusFilter = document.getElementById('userStatusFilter');
+  const userDateStart = document.getElementById('userDateStart');
+  const userDateEnd = document.getElementById('userDateEnd');
+  
+  if (addUserBtn) {
+    addUserBtn.onclick = addUserWithAdminPass;
+  }
+  
+  if (cancelUserBtn) {
+    cancelUserBtn.onclick = closeUserModal;
+  }
+  
+  if (userForm) {
+    userForm.onsubmit = handleUserFormSubmit;
+  }
+  
+  if (userTableBody) {
+    userTableBody.onclick = function(e) {
     const btn = e.target.closest('button');
     if (!btn) return;
-    const id = Number(btn.getAttribute('data-id'));
+      
+      const id = btn.getAttribute('data-id');
     if (btn.classList.contains('edit')) {
-      const user = users.find(u => u.id === id);
+        const user = usersData.find(u => u.user_id == id);
+        if (user) {
       editUserWithAdminPass(user);
-    } else if (btn.classList.contains('delete')) {
-      const pass = window.prompt('Enter admin password to delete this user:');
-      if (pass === ADMIN_PASSWORD) {
-        if (confirm('Delete this user?')) {
-          users = users.filter(u => u.id !== id);
-          renderUserTable();
         }
-      } else if (pass !== null) {
-        alert('Incorrect password.');
+      } else if (btn.classList.contains('delete')) {
+        deleteUserWithAdminPass(id);
       }
-    }
-  };
-  document.getElementById('userSearch').oninput = handleUserFilters;
-  document.getElementById('userStatusFilter').onchange = handleUserFilters;
-  document.getElementById('userDateStart').onchange = handleUserFilters;
-  document.getElementById('userDateEnd').onchange = handleUserFilters;
+    };
+  }
+  
+  // Filter event listeners
+  if (userSearch) {
+    userSearch.oninput = handleUserFilters;
+  }
+  
+  if (userStatusFilter) {
+    userStatusFilter.onchange = handleUserFilters;
+  }
+  
+  if (userDateStart) {
+    userDateStart.onchange = handleUserFilters;
+  }
+  
+  if (userDateEnd) {
+    userDateEnd.onchange = handleUserFilters;
+  }
+  
   // Close modal on outside click
-  document.getElementById('userModal').onclick = e => {
-    if (e.target === document.getElementById('userModal')) closeUserModal();
-  };
+  const userModal = document.getElementById('userModal');
+  if (userModal) {
+    userModal.onclick = e => {
+      if (e.target === userModal) closeUserModal();
+    };
+  }
+  
   // Show/hide password toggle for new password
   const toggleBtn = document.getElementById('toggleUserPassword');
   const passwordInput = document.getElementById('userPassword');
   const icon = document.getElementById('toggleUserPasswordIcon');
+  
   if (toggleBtn && passwordInput && icon) {
     toggleBtn.onclick = function() {
       if (passwordInput.type === 'password') {
@@ -226,12 +487,15 @@ function initUserManager() {
       }
     };
   }
+  
   // Show/hide password toggle for current password
   const toggleCurrentBtn = document.getElementById('toggleCurrentUserPassword');
   const currentPasswordInput = document.getElementById('userCurrentPassword');
   const currentIcon = document.getElementById('toggleCurrentUserPasswordIcon');
+  
   if (toggleCurrentBtn && currentPasswordInput && currentIcon) {
     toggleCurrentBtn.style.display = '';
+    // For admin accounts, show current password by default
     toggleCurrentBtn.onclick = function() {
       if (currentPasswordInput.type === 'password') {
         currentPasswordInput.type = 'text';
@@ -244,6 +508,12 @@ function initUserManager() {
       }
     };
   }
+  
+  // Initial fetch from API
+  fetchUsers(1, userRecordsPerPage);
 }
 
+// Export functions for global access
+window.changeUserPage = changeUserPage;
+window.changeUserRecordsPerPage = changeUserRecordsPerPage;
 window.initUserManager = initUserManager; 

@@ -88,6 +88,27 @@
   opacity: 0.9;
 }
 
+/* Role Badge Styles */
+.role-badge {
+  display: inline-block;
+  padding: 4px 12px;
+  border-radius: 20px;
+  font-size: 0.85em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.role-badge.role-user {
+  background: #2c3a6b;
+  color: #bfc9da;
+}
+
+.role-badge.role-admin {
+  background: #8b5cf6;
+  color: #e9ecef;
+}
+
 /* Modal Styles */
 .user-modal {
   position: fixed;

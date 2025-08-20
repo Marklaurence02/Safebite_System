@@ -13,6 +13,7 @@
   <link rel="stylesheet" href="../assets/css/Admin-assets/user.css">
   <link rel="stylesheet" href="../assets/css/Admin-assets/feedbacks.css">
   <link rel="stylesheet" href="../assets/css/Admin-assets/account-modal.css">
+  <link rel="stylesheet" href="../assets/css/Admin-assets/admin-log.css">
   <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
   <script src="https://unpkg.com/jspdf-autotable@latest/dist/jspdf.plugin.autotable.js"></script>
   <script>
@@ -102,6 +103,13 @@
                 <div class="calendar-container">
                   <input type="date" id="calendar-input" class="dashboard-date-input" placeholder="Select a date">
                 </div>
+                <button id="refreshDashboardBtn" class="refresh-btn" title="Refresh Dashboard Data">
+                  <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+                    <path d="M23 4v6h-6"></path>
+                    <path d="M1 20v-6h6"></path>
+                    <path d="M20.49 9A9 9 0 0 0 5.64 5.64L1 10m22 4l-4.64 4.36A9 9 0 0 1 3.51 15"></path>
+                  </svg>
+                </button>
               </div>
             </div>
             <div class="stat-cards-container">
@@ -399,6 +407,13 @@
             <input type="text" id="userSearch" class="user-search-input" placeholder="Search by name or email..." />
           </div>
           <div class="filter-group">
+            <label for="userRoleFilter">Role</label>
+            <select id="userRoleFilter" class="user-filter-select">
+              <option value="">All Roles</option>
+              <option value="User">User</option>
+            </select>
+          </div>
+          <div class="filter-group">
             <label for="userStatusFilter">Status</label>
             <select id="userStatusFilter" class="user-filter-select">
               <option value="">All Status</option>
@@ -414,6 +429,15 @@
             <label for="userDateEnd">End Date</label>
             <input type="date" id="userDateEnd" class="user-filter-date" />
           </div>
+          <div class="filter-group">
+            <label for="userRecordsPerPage">Records per Page</label>
+            <select id="userRecordsPerPage" onchange="changeUserRecordsPerPage(this.value)">
+              <option value="10">10</option>
+              <option value="25" selected>25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
         </div>
         <div class="filter-actions">
           <button class="filter-btn" id="addUserBtn">+ Add User</button>
@@ -425,6 +449,7 @@
             <tr>
               <th>Name</th>
               <th>Email</th>
+              <th>Role</th>
               <th>Date Created</th>
               <th>Status</th>
               <th>Actions</th>
@@ -434,6 +459,9 @@
             <!-- User rows will be rendered here by JS -->
           </tbody>
         </table>
+        <div id="userPagination" class="pagination-container">
+          <!-- JS will render pagination here -->
+        </div>
       </div>
     </div>
     <!-- User Modal -->
@@ -461,15 +489,7 @@
             <label>Date Created</label>
             <input type="text" id="userDateCreated" readonly style="background:#181f36;color:#bfc9da;" />
           </div>
-          <div class="form-group password-group" style="display:none;">
-            <label for="userCurrentPassword" id="userCurrentPasswordLabel" style="display:none;">Current Password</label>
-            <div style="position:relative;display:flex;align-items:center;">
-              <input type="password" id="userCurrentPassword" readonly style="display:none;background:#181f36;color:#bfc9da;" tabindex="-1" />
-              <button type="button" id="toggleCurrentUserPassword" style="position:absolute;right:10px;background:none;border:none;cursor:pointer;padding:0 6px;color:#bfc9da;display:none;" tabindex="-1" aria-label="Show current password">
-                <span id="toggleCurrentUserPasswordIcon">&#128065;</span>
-              </button>
-            </div>
-          </div>
+
           <div class="form-group password-group" style="display:none;">
             <label for="userPassword">New Password</label>
             <div style="position:relative;display:flex;align-items:center;">
@@ -534,6 +554,19 @@
             <label for="activityDateEnd">End Date</label>
             <input type="date" id="activityDateEnd" />
           </div>
+          <div class="filter-group">
+            <label for="activityRecordsPerPage">Records per Page</label>
+            <select id="activityRecordsPerPage" onchange="changeActivityLogRecordsPerPage(this.value)">
+              <option value="10">10</option>
+              <option value="25" selected>25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="activityUserFilter">User Filter</label>
+            <input type="text" id="activityUserFilter" placeholder="Filter by username..." />
+          </div>
         </div>
         <div class="filter-actions">
           <button class="filter-btn" id="filterActivityLogBtn">Filter</button>
@@ -556,6 +589,9 @@
             <!-- Activity rows will be rendered here by JS -->
           </tbody>
         </table>
+        <div id="activityLogPagination" class="pagination-container">
+          <!-- JS will render pagination here -->
+        </div>
       </div>
     </div>
   </div>
@@ -575,46 +611,63 @@
       <div class="report-filters admin-log-filters">
         <div class="filter-controls">
           <div class="filter-group">
-            <label for="adminActivityTypeFilter">Activity Type</label>
-            <select id="adminActivityTypeFilter">
-              <option value="">All</option>
+            <label for="adminLogActivityType">Activity Type</label>
+            <select id="adminLogActivityType">
+              <option value="all">All Activities</option>
+              <option value="add">Add</option>
+              <option value="edit">Edit</option>
               <option value="update">Update</option>
-              <option value="create">Create</option>
               <option value="delete">Delete</option>
               <option value="login">Login</option>
               <option value="logout">Logout</option>
             </select>
           </div>
           <div class="filter-group">
-            <label for="adminLogDateStart">Start Date</label>
-            <input type="date" id="adminLogDateStart" />
+            <label for="adminLogStartDate">Start Date</label>
+            <input type="date" id="adminLogStartDate" />
           </div>
           <div class="filter-group">
-            <label for="adminLogDateEnd">End Date</label>
-            <input type="date" id="adminLogDateEnd" />
+            <label for="adminLogEndDate">End Date</label>
+            <input type="date" id="adminLogEndDate" />
+          </div>
+          <div class="filter-group">
+            <label for="adminLogRecordsPerPage">Records per Page</label>
+            <select id="adminLogRecordsPerPage" onchange="changeAdminLogRecordsPerPage(this.value)">
+              <option value="10">10</option>
+              <option value="25" selected>25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </select>
+          </div>
+          <div class="filter-group">
+            <label for="adminLogAdminFilter">Admin Filter</label>
+            <input type="text" id="adminLogAdminFilter" placeholder="Filter by admin username..." />
           </div>
         </div>
         <div class="filter-actions">
-          <button class="filter-btn" id="filterAdminLogBtn">Filter</button>
-          <button class="filter-btn export" id="exportAdminLogExcel">Download Excel</button>
-          <button class="filter-btn export" id="exportAdminLogPDF">Download PDF</button>
+          <button class="filter-btn" id="adminLogFilterBtn">Filter</button>
+          <button class="filter-btn export" id="adminLogDownloadExcel">Download Excel</button>
+          <button class="filter-btn export" id="adminLogDownloadPDF">Download PDF</button>
         </div>
       </div>
       <div class="report-preview-area">
         <div class="report-preview-title">Admin Log</div>
-        <table class="user-table">
+        <table class="admin-log-table">
           <thead>
             <tr>
-              <th>Admin</th>
-              <th>Activity</th>
-              <th>Date/Time</th>
-              <th>Details</th>
+              <th>ADMIN</th>
+              <th>ACTIVITY</th>
+              <th>DATE/TIME</th>
+              <th>DETAILS</th>
             </tr>
           </thead>
           <tbody id="adminLogTableBody">
-            <!-- Admin log rows will be rendered here by JS -->
+            <!-- JS will render rows here -->
           </tbody>
         </table>
+        <div id="adminLogPagination" class="pagination-container">
+          <!-- JS will render pagination here -->
+        </div>
       </div>
     </div>
   </div>
@@ -921,3 +974,4 @@ function handleAdminPassFormSubmit(e) {
 
 </body>
 </html>
+

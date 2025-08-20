@@ -1,5 +1,45 @@
 // js/ad-chart.js - Renders the Device Activity chart and manages dashboard data
 
+// Global variables to store fetched data
+let activeUsersData = 0;
+let spoilageAlertsData = 0;
+let alertsByUser = [];
+
+// Function to fetch active users count from API
+function fetchActiveUsers() {
+  fetch('../../backend/api/Admin-api/get-active-users.php')
+    .then(response => response.json())
+    .then(data => {
+      activeUsersData = data.active_user_count;
+      updateDashboardDisplay();
+    })
+    .catch(error => console.error('Error fetching active users:', error));
+}
+
+// Function to fetch spoilage alerts count from API
+function fetchSpoilageAlerts() {
+  fetch('../../backend/api/Admin-api/get-spoilage-alerts.php')
+    .then(response => response.json())
+    .then(data => {
+      alertsByUser = data;
+      // Calculate total alerts count
+      spoilageAlertsData = data.reduce((total, item) => total + parseInt(item.alert_count), 0);
+      updateDashboardDisplay();
+    })
+    .catch(error => console.error('Error fetching spoilage alerts:', error));
+}
+
+// Function to get alerts count for a specific user
+function getAlertsForUser(userId) {
+  const userAlert = alertsByUser.find(item => item.user_id == userId);
+  return userAlert ? parseInt(userAlert.alert_count) : 0;
+}
+
+// Function to get all alerts data
+function getAllAlertsData() {
+  return alertsByUser;
+}
+
 // Dashboard Data with filter functionality
 const dashboardData = {
   // Stat Cards Data - Different data for different dates
@@ -164,26 +204,26 @@ function updateDashboardDisplay() {
   
   console.log(`Updating dashboard display for date: ${currentDate}, filter: ${currentFilter}`);
   
-  // Update stat card values
+  // Update stat card values using fetched data
+  // Update Active Users with real data from API
+  const activeUsersElement = document.querySelector('.stat-card:nth-child(1) .stat-value');
+  if (activeUsersElement) {
+    activeUsersElement.textContent = activeUsersData;
+  }
+  
+  // Update Device Reports (keep existing logic for now)
   const statCards = dashboardData.statCards[currentDate];
   if (statCards) {
-    // Update Active Users
-    const activeUsersElement = document.querySelector('.stat-card:nth-child(1) .stat-value');
-    if (activeUsersElement) {
-      activeUsersElement.textContent = statCards.activeUsers.value;
-    }
-    
-    // Update Device Reports
     const deviceReportsElement = document.querySelector('.stat-card:nth-child(2) .stat-value');
     if (deviceReportsElement) {
       deviceReportsElement.textContent = statCards.deviceReports.value;
     }
-    
-    // Update Spoilage Alerts
-    const spoilageAlertsElement = document.querySelector('.stat-card:nth-child(3) .stat-value');
-    if (spoilageAlertsElement) {
-      spoilageAlertsElement.textContent = statCards.spoilageAlerts.value;
-    }
+  }
+  
+  // Update Spoilage Alerts with real data from API
+  const spoilageAlertsElement = document.querySelector('.stat-card:nth-child(3) .stat-value');
+  if (spoilageAlertsElement) {
+    spoilageAlertsElement.textContent = spoilageAlertsData;
   }
   
   // Update stat card charts
@@ -203,6 +243,26 @@ function initializeFilterEventListeners() {
   if (activityFilter) {
     activityFilter.addEventListener('change', (e) => {
       updateActivityFilter(e.target.value);
+    });
+  }
+  
+  // Refresh dashboard button
+  const refreshBtn = document.getElementById('refreshDashboardBtn');
+  if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => {
+      // Add loading state
+      refreshBtn.style.opacity = '0.6';
+      refreshBtn.style.pointerEvents = 'none';
+      
+      // Fetch fresh data
+      fetchActiveUsers();
+      fetchSpoilageAlerts();
+      
+      // Reset button state after a short delay
+      setTimeout(() => {
+        refreshBtn.style.opacity = '1';
+        refreshBtn.style.pointerEvents = 'auto';
+      }, 1000);
     });
   }
 }
@@ -399,6 +459,10 @@ document.addEventListener('DOMContentLoaded', () => {
   // Initialize filter event listeners
   initializeFilterEventListeners();
   
+  // Fetch real data from APIs
+  fetchActiveUsers();
+  fetchSpoilageAlerts();
+  
   // Initial draw if dashboard elements exist
   if(document.getElementById('activityChart')) {
     initializeDashboardStatCharts();
@@ -420,7 +484,11 @@ if (typeof module !== 'undefined' && module.exports) {
     initializeDashboardStatCharts,
     updateDashboardDisplay,
     initializeFilterEventListeners,
-    initializeNativeDateInput
+    initializeNativeDateInput,
+    fetchActiveUsers,
+    fetchSpoilageAlerts,
+    getAlertsForUser,
+    getAllAlertsData
   };
 } else {
   window.dashboardData = dashboardData;
@@ -436,4 +504,8 @@ if (typeof module !== 'undefined' && module.exports) {
   window.updateDashboardDisplay = updateDashboardDisplay;
   window.initializeFilterEventListeners = initializeFilterEventListeners;
   window.initializeNativeDateInput = initializeNativeDateInput;
+  window.fetchActiveUsers = fetchActiveUsers;
+  window.fetchSpoilageAlerts = fetchSpoilageAlerts;
+  window.getAlertsForUser = getAlertsForUser;
+  window.getAllAlertsData = getAllAlertsData;
 }

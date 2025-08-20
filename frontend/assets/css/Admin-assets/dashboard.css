@@ -98,8 +98,28 @@ main {
   border: 1px solid #2a3b6d;
   border-radius: 6px;
   padding: 4px 16px;
-  font-size: 1em;
-  outline: none;
+}
+
+.refresh-btn {
+  background: #3b7bfa;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.refresh-btn:hover {
+  background: #2d5fd8;
+}
+
+.refresh-btn svg {
+  width: 16px;
+  height: 16px;
 }
 
 .sensors-gauges {

@@ -52,4 +52,143 @@
   font-weight: 700;
   margin-bottom: 16px;
   color: #fff;
-} 
+}
+
+/* Pagination Styles */
+.pagination-container {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+}
+
+.pagination-info {
+  color: #bfc9da;
+  font-size: 0.9em;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.pagination-btn {
+  background: #22336a;
+  color: #fff;
+  border: 1px solid #3a4a8b;
+  border-radius: 6px;
+  padding: 8px 12px;
+  cursor: pointer;
+  font-size: 0.9em;
+  transition: all 0.2s ease;
+}
+
+.pagination-btn:hover {
+  background: #3a4a8b;
+  border-color: #4a5a9b;
+}
+
+.pagination-btn.active {
+  background: #3b7bfa;
+  border-color: #3b7bfa;
+}
+
+.pagination-ellipsis {
+  color: #bfc9da;
+  padding: 0 8px;
+}
+
+/* Activity Badge Styles */
+.activity-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.activity-login {
+  background: #d4edda;
+  color: #155724;
+}
+
+.activity-logout {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.activity-create {
+  background: #d1ecf1;
+  color: #0c5460;
+}
+
+.activity-update {
+  background: #fff3cd;
+  color: #856404;
+}
+
+.activity-delete {
+  background: #f8d7da;
+  color: #721c24;
+}
+
+.activity-edit {
+  background: #e2e3e5;
+  color: #383d41;
+}
+
+.activity-add {
+  background: #d4edda;
+  color: #155724;
+}
+
+/* Empty State Styles */
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+}
+
+.empty-state-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.empty-state-icon {
+  font-size: 3em;
+  opacity: 0.7;
+}
+
+.empty-state-title {
+  font-size: 1.2em;
+  font-weight: 600;
+  color: #bfc9da;
+}
+
+.empty-state-desc {
+  color: #8a9bb8;
+  font-size: 0.95em;
+  max-width: 400px;
+  line-height: 1.4;
+}
+
+/* Status badges for users */
+.status-badge {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.85em;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.status-badge.status-active { background: #d4edda; color: #155724; }
+.status-badge.status-inactive { background: #f8d7da; color: #721c24; }
+.status-badge.status-pending { background: #fff3cd; color: #856404; }
+.status-badge.status-suspended { background: #e2e3e5; color: #383d41; } 

@@ -91,8 +91,8 @@ function showUserActivityLog() {
   const template = document.getElementById('user-activity-log-template');
   if (mainContent && template) {
     mainContent.innerHTML = template.innerHTML;
-    if (window.initUserActivityLog) {
-      window.initUserActivityLog();
+    if (window.initializeUserActivityLog) {
+      window.initializeUserActivityLog();
     }
   }
 }
@@ -102,6 +102,18 @@ function showFeedbacks() {
   const template = document.getElementById('feedbacks-template');
   if (mainContent && template) {
     mainContent.innerHTML = template.innerHTML;
+  }
+}
+
+function showAdminLog() {
+  const mainContent = document.getElementById('main-content');
+  const template = document.getElementById('admin-log-template');
+  if (mainContent && template) {
+    mainContent.innerHTML = template.innerHTML;
+    // Initialize admin log functionality
+    if (window.initializeAdminLog) {
+      window.initializeAdminLog();
+    }
   }
 }
 
@@ -130,9 +142,7 @@ function switchPage(page) {
     } else if (page === 'user-activity-log') {
         showUserActivityLog();
     } else if (page === 'admin-log') {
-        if (window.showAdminLog) {
-            window.showAdminLog();
-        }
+        showAdminLog();
     } else if (page === 'feedbacks') {
         showFeedbacks();
     }
