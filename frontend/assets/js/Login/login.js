@@ -16,7 +16,16 @@ document.addEventListener('DOMContentLoaded', function() {
     const signinBtn = document.querySelector('.signin-btn');
     
     // Signup form elements
-    const signupNameInput = document.getElementById('signupName');
+    const signupFirstNameInput = document.getElementById('signupFirstName');
+    const signupLastNameInput = document.getElementById('signupLastName');
+    const signupContactNumberInput = document.getElementById('signupContactNumber');
+    const signupTesterTypeInput = document.getElementById('signupTesterType');
+    const signupPrevBtn = document.getElementById('signupPrevBtn');
+    const signupNextBtn = document.getElementById('signupNextBtn');
+    const signupSubmitBtn = document.getElementById('signupSubmitBtn');
+    const signupSteps = document.querySelectorAll('#signupForm .signup-steps .step');
+    const stepperItems = document.querySelectorAll('#signupForm .stepper .stepper-item');
+    let currentSignupStep = 1;
     const signupEmailInput = document.getElementById('signupEmail');
     const signupPasswordInput = document.getElementById('signupPassword');
     const confirmPasswordInput = document.getElementById('confirmPassword');
@@ -101,6 +110,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         // Reset password visibility
         resetPasswordVisibility();
+
+        // Reset signup steps
+        if (signupSteps && signupSteps.length) {
+            currentSignupStep = 1;
+            updateSignupStepUI();
+        }
     }
 
     // Reset password visibility toggles
@@ -118,6 +133,93 @@ document.addEventListener('DOMContentLoaded', function() {
         passwordInputs.forEach(input => {
             input.setAttribute('type', 'password');
         });
+    }
+    // Signup step navigation and validation
+    function updateSignupStepUI(direction = 'forward') {
+        signupSteps.forEach(step => {
+            const stepNum = parseInt(step.getAttribute('data-step'), 10);
+            const isActive = stepNum === currentSignupStep;
+            step.classList.remove('slide-in-right','slide-out-left','slide-in-left','slide-out-right');
+            if (isActive) {
+                step.classList.add('active', direction === 'forward' ? 'slide-in-right' : 'slide-in-left');
+            } else {
+                const wasActive = step.classList.contains('active');
+                if (wasActive) {
+                    step.classList.add(direction === 'forward' ? 'slide-out-left' : 'slide-out-right');
+                    setTimeout(() => step.classList.remove('active'), 250);
+                }
+            }
+        });
+
+        // Update stepper
+        if (stepperItems && stepperItems.length) {
+            stepperItems.forEach(item => {
+                const s = parseInt(item.getAttribute('data-step'), 10);
+                item.classList.toggle('active', s === currentSignupStep);
+                item.classList.toggle('completed', s < currentSignupStep);
+            });
+        }
+
+        if (signupPrevBtn) signupPrevBtn.style.display = currentSignupStep > 1 ? 'inline-block' : 'none';
+        if (signupNextBtn) signupNextBtn.style.display = currentSignupStep < 3 ? 'inline-block' : 'none';
+        if (signupSubmitBtn) signupSubmitBtn.style.display = currentSignupStep === 3 ? 'inline-block' : 'none';
+    }
+
+    function validateSignupStep(stepNum) {
+        let ok = true;
+        if (stepNum === 1) {
+            if (!signupFirstNameInput.value.trim() || !validateName(signupFirstNameInput.value.trim())) {
+                showError(signupFirstNameInput, 'First name must be at least 2 characters long');
+                ok = false;
+            }
+            if (!signupLastNameInput.value.trim() || !validateName(signupLastNameInput.value.trim())) {
+                showError(signupLastNameInput, 'Last name must be at least 2 characters long');
+                ok = false;
+            }
+            const email = signupEmailInput.value.trim();
+            if (!email || !validateEmail(email)) {
+                showError(signupEmailInput, 'Please enter a valid email address');
+                ok = false;
+            }
+        } else if (stepNum === 2) {
+            // Optional fields; no strict validation
+        } else if (stepNum === 3) {
+            const password = signupPasswordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            if (!password || !validatePassword(password)) {
+                showError(signupPasswordInput, 'Password must be at least 8 characters with upper, lower, number, and special');
+                ok = false;
+            }
+            if (!confirmPassword || password !== confirmPassword) {
+                showError(confirmPasswordInput, 'Passwords do not match');
+                ok = false;
+            }
+        }
+        return ok;
+    }
+
+    if (signupNextBtn) {
+        signupNextBtn.addEventListener('click', function() {
+            if (!validateSignupStep(currentSignupStep)) return;
+            if (currentSignupStep < 3) {
+                currentSignupStep += 1;
+                updateSignupStepUI('forward');
+            }
+        });
+    }
+
+    if (signupPrevBtn) {
+        signupPrevBtn.addEventListener('click', function() {
+            if (currentSignupStep > 1) {
+                currentSignupStep -= 1;
+                updateSignupStepUI('back');
+            }
+        });
+    }
+
+    // Initialize step UI on load if signup view is present
+    if (signupSteps && signupSteps.length) {
+        updateSignupStepUI();
     }
 
     // Password visibility toggle function
@@ -228,11 +330,22 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Real-time validation for signup form
-    if (signupNameInput) {
-        signupNameInput.addEventListener('blur', function() {
+    if (signupFirstNameInput) {
+        signupFirstNameInput.addEventListener('blur', function() {
             const name = this.value.trim();
             if (name && !validateName(name)) {
-                showError(this, 'Name must be at least 2 characters long');
+                showError(this, 'First name must be at least 2 characters long');
+            } else {
+                clearError(this);
+            }
+        });
+    }
+
+    if (signupLastNameInput) {
+        signupLastNameInput.addEventListener('blur', function() {
+            const name = this.value.trim();
+            if (name && !validateName(name)) {
+                showError(this, 'Last name must be at least 2 characters long');
             } else {
                 clearError(this);
             }
@@ -388,25 +501,36 @@ document.addEventListener('DOMContentLoaded', function() {
         signupForm.addEventListener('submit', async function(e) {
             e.preventDefault();
             
-            const name = signupNameInput.value.trim();
+            const firstName = signupFirstNameInput.value.trim();
+            const lastName = signupLastNameInput.value.trim();
             const email = signupEmailInput.value.trim();
             const password = signupPasswordInput.value;
             const confirmPassword = confirmPasswordInput.value;
+            const contactNumber = signupContactNumberInput ? signupContactNumberInput.value.trim() : '';
+            const testerTypeId = signupTesterTypeInput ? signupTesterTypeInput.value : '';
             
             // Clear previous errors
-            clearError(signupNameInput);
+            clearError(signupFirstNameInput);
+            clearError(signupLastNameInput);
             clearError(signupEmailInput);
             clearError(signupPasswordInput);
             clearError(confirmPasswordInput);
             
-            // Validate form
+            // Validate all steps before final submit
             let isValid = true;
-            
-            if (!name) {
-                showError(signupNameInput, 'Full name is required');
+            if (!firstName) {
+                showError(signupFirstNameInput, 'First name is required');
                 isValid = false;
-            } else if (!validateName(name)) {
-                showError(signupNameInput, 'Name must be at least 2 characters long');
+            } else if (!validateName(firstName)) {
+                showError(signupFirstNameInput, 'First name must be at least 2 characters long');
+                isValid = false;
+            }
+
+            if (!lastName) {
+                showError(signupLastNameInput, 'Last name is required');
+                isValid = false;
+            } else if (!validateName(lastName)) {
+                showError(signupLastNameInput, 'Last name must be at least 2 characters long');
                 isValid = false;
             }
             
@@ -454,7 +578,7 @@ document.addEventListener('DOMContentLoaded', function() {
             
             try {
                 // Perform user signup with PHP backend
-                await performSignup(name, email, password);
+                await performSignup({ firstName, lastName, email, password, contactNumber, testerTypeId, recaptchaToken });
             } catch (error) {
                 console.error('User Signup error:', error);
             } finally {
@@ -563,10 +687,8 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     // Real signup process with PHP backend
-    async function performSignup(name, email, password) {
+    async function performSignup({ firstName, lastName, email, password, contactNumber, testerTypeId, recaptchaToken }) {
         try {
-            const [firstName, ...lastNameParts] = name.trim().split(' ');
-            const lastName = lastNameParts.join(' ') || firstName;
             const username = email.split('@')[0]; // Generate username from email
             
             // Force XAMPP path for backend
@@ -586,6 +708,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     email: email,
                     password: password,
                     confirm_password: password,
+                    contact_number: contactNumber || null,
+                    tester_type_id: testerTypeId ? parseInt(testerTypeId, 10) : null,
                     recaptcha_token: recaptchaToken
                 })
             });

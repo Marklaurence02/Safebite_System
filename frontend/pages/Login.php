@@ -61,67 +61,135 @@
                 <!-- Signup Form -->
                 <div id="signupView" class="auth-view">
                     <form class="signup-form" id="signupForm">
-                        <div class="input-group">
-                            <label for="signupName">Full Name</label>
-                            <div class="input-field">
-                                <i class="fas fa-user"></i>
-                                <input type="text" id="signupName" name="name" placeholder="Enter your full name" required>
+                        <!-- Stepper -->
+                        <div class="stepper">
+                            <div class="stepper-item active" data-step="1">
+                                <div class="step-counter">1</div>
+                                <div class="step-name">Basic</div>
+                            </div>
+                            <div class="stepper-item" data-step="2">
+                                <div class="step-counter">2</div>
+                                <div class="step-name">Details</div>
+                            </div>
+                            <div class="stepper-item" data-step="3">
+                                <div class="step-counter">3</div>
+                                <div class="step-name">Security</div>
                             </div>
                         </div>
 
-                        <div class="input-group">
-                            <label for="signupEmail">Email</label>
-                            <div class="input-field">
-                                <i class="fas fa-envelope"></i>
-                                <input type="email" id="signupEmail" name="email" placeholder="Enter your email" required>
-                            </div>
-                        </div>
+                        <div class="signup-steps">
+                            <!-- Step 1: Basic Info -->
+                            <div class="step active" data-step="1">
+                                <div class="input-group">
+                                    <label for="signupFirstName">First Name</label>
+                                    <div class="input-field">
+                                        <i class="fas fa-user"></i>
+                                        <input type="text" id="signupFirstName" name="first_name" placeholder="Enter your first name" required>
+                                    </div>
+                                </div>
 
-                        <div class="input-group">
-                            <label for="signupPassword">Password</label>
-                            <div class="input-field">
-                                <i class="fas fa-lock"></i>
-                                <input type="password" id="signupPassword" name="password" placeholder="Create a password" required>
-                                <button type="button" class="toggle-password" id="toggleSignupPassword">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
-                            <!-- Password strength bar -->
-                            <div class="password-strength" style="margin-top:10px;">
-                                <div class="strength-label" id="passwordStrengthLabel">Weak</div>
-                                <div class="strength-track">
-                                    <div class="strength-bar" id="passwordStrengthBar"></div>
+                                <div class="input-group">
+                                    <label for="signupLastName">Last Name</label>
+                                    <div class="input-field">
+                                        <i class="fas fa-user"></i>
+                                        <input type="text" id="signupLastName" name="last_name" placeholder="Enter your last name" required>
+                                    </div>
+                                </div>
+
+                                <div class="input-group">
+                                    <label for="signupEmail">Email</label>
+                                    <div class="input-field">
+                                        <i class="fas fa-envelope"></i>
+                                        <input type="email" id="signupEmail" name="email" placeholder="Enter your email" required>
+                                    </div>
                                 </div>
                             </div>
-                            <!-- Password requirements checklist -->
-                            <div id="passwordRequirements" style="margin-top:8px; font-size:0.9rem; color:#b0b0b0; line-height:1.4;">
-                                <ul style="list-style:none; padding-left:0; margin:0;">
-                                    <li id="req-length">• At least 8 characters</li>
-                                    <li id="req-upper">• One uppercase letter (A-Z)</li>
-                                    <li id="req-lower">• One lowercase letter (a-z)</li>
-                                    <li id="req-number">• One number (0-9)</li>
-                                    <li id="req-special">• One special character (!@#$%^&* etc.)</li>
-                                </ul>
+
+                            <!-- Step 2: Contact and Tester Type -->
+                            <div class="step" data-step="2">
+                                <div class="input-group">
+                                    <label for="signupContactNumber">Contact Number</label>
+                                    <div class="input-field">
+                                        <i class="fas fa-phone"></i>
+                                        <input type="text" id="signupContactNumber" name="contact_number" placeholder="Enter your contact number">
+                                    </div>
+                                </div>
+
+                                <div class="input-group">
+                                    <label for="signupTesterType">Tester Type</label>
+                                    <div class="input-field">
+                                        <i class="fas fa-vials"></i>
+                                        <select id="signupTesterType" name="tester_type_id">
+                                            <option value="" disabled selected>Select Tester Type</option>
+                                            <option value="1">Personal Tester</option>
+                                            <option value="2">Canteen Tester</option>
+                                            <option value="3">Restaurant Tester</option>
+                                            <option value="4">Cafeteria Tester</option>
+                                            <option value="5">Catering Tester</option>
+                                        </select>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Step 3: Security -->
+                            <div class="step" data-step="3">
+                                <div class="input-group">
+                                    <label for="signupPassword">Password</label>
+                                    <div class="input-field">
+                                        <i class="fas fa-lock"></i>
+                                        <input type="password" id="signupPassword" name="password" placeholder="Create a password" required>
+                                        <button type="button" class="toggle-password" id="toggleSignupPassword">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                    <!-- Password strength bar -->
+                                    <div class="password-strength" style="margin-top:10px;">
+                                        <div class="strength-label" id="passwordStrengthLabel">Weak</div>
+                                        <div class="strength-track">
+                                            <div class="strength-bar" id="passwordStrengthBar"></div>
+                                        </div>
+                                    </div>
+                                    <!-- Password requirements checklist -->
+                                    <div id="passwordRequirements" style="margin-top:8px; font-size:0.9rem; color:#b0b0b0; line-height:1.4;">
+                                        <ul style="list-style:none; padding-left:0; margin:0;">
+                                            <li id="req-length">• At least 8 characters</li>
+                                            <li id="req-upper">• One uppercase letter (A-Z)</li>
+                                            <li id="req-lower">• One lowercase letter (a-z)</li>
+                                            <li id="req-number">• One number (0-9)</li>
+                                            <li id="req-special">• One special character (!@#$%^&* etc.)</li>
+                                        </ul>
+                                    </div>
+                                </div>
+
+                                <div class="input-group">
+                                    <label for="confirmPassword">Confirm Password</label>
+                                    <div class="input-field">
+                                        <i class="fas fa-lock"></i>
+                                        <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
+                                        <button type="button" class="toggle-password" id="toggleConfirmPassword">
+                                            <i class="fas fa-eye"></i>
+                                        </button>
+                                    </div>
+                                </div>
+
+                                <div class="recaptcha-wrap" style="margin:10px 0; transform: scale(0.85); transform-origin: 0 0;">
+                                    <div class="g-recaptcha" data-sitekey="6Le-aqwrAAAAAEXKtzu2pvOZjMT034GBPg_zkLNJ"></div>
+                                </div>
                             </div>
                         </div>
 
-                        <div class="input-group">
-                            <label for="confirmPassword">Confirm Password</label>
-                            <div class="input-field">
-                                <i class="fas fa-lock"></i>
-                                <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm your password" required>
-                                <button type="button" class="toggle-password" id="toggleConfirmPassword">
-                                    <i class="fas fa-eye"></i>
-                                </button>
-                            </div>
+                        <!-- Step Controls -->
+                        <div class="step-controls">
+                            <button type="button" id="signupPrevBtn" class="signin-btn" style="display:none; background:#9e9e9e;">
+                                <span>Back</span>
+                            </button>
+                            <button type="button" id="signupNextBtn" class="signin-btn">
+                                <span>Next</span>
+                            </button>
+                            <button type="submit" id="signupSubmitBtn" class="signin-btn" style="display:none;">
+                                <span>Create Account</span>
+                            </button>
                         </div>
-
-                        <div class="recaptcha-wrap" style="margin:10px 0; transform: scale(0.85); transform-origin: 0 0;">
-                            <div class="g-recaptcha" data-sitekey="6Le-aqwrAAAAAEXKtzu2pvOZjMT034GBPg_zkLNJ"></div>
-                        </div>
-                        <button type="submit" class="signin-btn">
-                            <span>Create Account</span>
-                        </button>
                     </form>
 
                     <!-- Back to Login Link -->

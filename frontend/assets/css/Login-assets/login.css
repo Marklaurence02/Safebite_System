@@ -225,6 +225,67 @@ body::after {
     margin-bottom: 20px;
 }
 
+/* Signup steps */
+.signup-steps .step { display: none; }
+.signup-steps { position: relative; overflow: hidden; }
+.signup-steps .step.active { display: block; }
+.signup-steps .step { animation-duration: 300ms; animation-timing-function: ease; }
+
+/* Stepper */
+.stepper {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+}
+.stepper-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    opacity: 0.6;
+    transition: opacity 200ms ease, transform 200ms ease;
+}
+.stepper-item .step-counter {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: #e0e7ff;
+    color: #1e3c72;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 700;
+}
+.stepper-item .step-name {
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+}
+.stepper-item.active { opacity: 1; }
+.stepper-item.completed .step-counter { background: #1e3c72; color: #fff; }
+
+/* Slide animations (unique names to avoid conflicts) */
+@keyframes stepSlideInLeft { from { transform: translateX(-20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes stepSlideOutLeft { from { transform: translateX(0); opacity: 1; } to { transform: translateX(-20px); opacity: 0; } }
+@keyframes stepSlideInRight { from { transform: translateX(20px); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+@keyframes stepSlideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(20px); opacity: 0; } }
+
+.step.slide-in-right { animation-name: stepSlideInRight; }
+.step.slide-out-left { animation-name: stepSlideOutLeft; }
+.step.slide-in-left { animation-name: stepSlideInLeft; }
+.step.slide-out-right { animation-name: stepSlideOutRight; }
+
+.step-controls {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 10px;
+}
+
+.step-controls #signupSubmitBtn {
+    grid-column: span 2;
+}
+
 .input-group {
     margin-bottom: 20px;
 }
@@ -262,7 +323,30 @@ body::after {
     backdrop-filter: blur(10px);
 }
 
+/* Match select styling with inputs */
+.input-field select {
+    width: 100%;
+    padding: 15px 50px 15px 45px;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.9);
+    backdrop-filter: blur(10px);
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    color: #333;
+}
+
 .input-field input:focus {
+    outline: none;
+    border-color: #1e3c72;
+    box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
+    background: white;
+}
+
+.input-field select:focus {
     outline: none;
     border-color: #1e3c72;
     box-shadow: 0 0 0 3px rgba(30, 60, 114, 0.1);
@@ -586,6 +670,11 @@ body::before {
 
 /* Error states */
 .input-field.error input {
+    border-color: #f44336;
+    box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
+}
+
+.input-field.error select {
     border-color: #f44336;
     box-shadow: 0 0 0 3px rgba(244, 67, 54, 0.1);
 }

@@ -42,6 +42,7 @@ $email = Auth::sanitizeInput($input['email']);
 $password = $input['password'];
 $confirmPassword = $input['confirm_password'];
 $contactNumber = isset($input['contact_number']) ? Auth::sanitizeInput($input['contact_number']) : null;
+$testerTypeId = isset($input['tester_type_id']) && $input['tester_type_id'] !== '' ? (int)$input['tester_type_id'] : null;
 $recaptchaToken = trim($input['recaptcha_token']);
 
 // Verify reCAPTCHA
@@ -129,8 +130,8 @@ try {
     $passwordHash = Auth::hashPassword($password);
     
     // Insert new user
-    $insertQuery = "INSERT INTO users (first_name, last_name, username, email, contact_number, password_hash, role, account_status) 
-                    VALUES (?, ?, ?, ?, ?, ?, 'User', 'active')";
+    $insertQuery = "INSERT INTO users (first_name, last_name, username, email, contact_number, tester_type_id, password_hash, role, account_status) 
+                    VALUES (?, ?, ?, ?, ?, ?, ?, 'User', 'active')";
     
     $insertStmt = $db->prepare($insertQuery);
     $insertStmt->execute([
@@ -139,6 +140,7 @@ try {
         $username,
         $email,
         $contactNumber,
+        $testerTypeId,
         $passwordHash
     ]);
     
@@ -158,6 +160,7 @@ try {
             'username' => $username,
             'email' => $email,
             'role' => 'User',
+            'tester_type_id' => $testerTypeId,
             'full_name' => $firstName . ' ' . $lastName
         ]
     ];
