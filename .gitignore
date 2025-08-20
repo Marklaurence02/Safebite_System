@@ -1,0 +1,10 @@
+backend/config/gemini.php
+.env
+.env.*
+node_modules/
+vendor/
+.DS_Store
+Thumbs.db
+*.log
+/dist/
+/build/
