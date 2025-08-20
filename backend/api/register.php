@@ -10,6 +10,7 @@ error_reporting(E_ALL);
 
 require_once '../config/database.php';
 require_once '../config/auth.php';
+require_once '../config/recaptcha.php';
 
 // Set CORS headers
 Auth::setCORSHeaders();
@@ -29,7 +30,8 @@ if (!$input) {
 // Validate required fields
 if (!isset($input['first_name']) || !isset($input['last_name']) || 
     !isset($input['username']) || !isset($input['email']) || 
-    !isset($input['password']) || !isset($input['confirm_password'])) {
+    !isset($input['password']) || !isset($input['confirm_password']) ||
+    !isset($input['recaptcha_token'])) {
     Auth::sendResponse(['error' => 'All fields are required'], 400);
 }
 
@@ -40,6 +42,38 @@ $email = Auth::sanitizeInput($input['email']);
 $password = $input['password'];
 $confirmPassword = $input['confirm_password'];
 $contactNumber = isset($input['contact_number']) ? Auth::sanitizeInput($input['contact_number']) : null;
+$recaptchaToken = trim($input['recaptcha_token']);
+
+// Verify reCAPTCHA
+$secret = getenv('RECAPTCHA_SECRET');
+if (!$secret && isset($RECAPTCHA_SECRET) && $RECAPTCHA_SECRET) {
+    $secret = $RECAPTCHA_SECRET;
+}
+if (!$secret) {
+    Auth::sendResponse(['error' => 'reCAPTCHA is not configured'], 500);
+}
+
+$verifyUrl = 'https://www.google.com/recaptcha/api/siteverify';
+$ch = curl_init($verifyUrl);
+curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+curl_setopt($ch, CURLOPT_POST, true);
+curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query([
+    'secret' => $secret,
+    'response' => $recaptchaToken,
+    'remoteip' => $_SERVER['REMOTE_ADDR'] ?? null
+]));
+$verifyResp = curl_exec($ch);
+$http = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+$cerr = curl_error($ch);
+curl_close($ch);
+
+if ($verifyResp === false) {
+    Auth::sendResponse(['error' => 'reCAPTCHA verification failed: ' . $cerr], 500);
+}
+$verifyJson = json_decode($verifyResp, true);
+if ($http >= 400 || !$verifyJson || empty($verifyJson['success'])) {
+    Auth::sendResponse(['error' => 'reCAPTCHA verification failed'], 400);
+}
 
 // Validate input lengths
 if (strlen($firstName) < 2 || strlen($lastName) < 2) {

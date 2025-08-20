@@ -162,7 +162,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function validatePassword(password) {
-        return password.length >= 6;
+        // Strong password: min 8, upper, lower, number, special
+        const lengthOk = password.length >= 8;
+        const upperOk = /[A-Z]/.test(password);
+        const lowerOk = /[a-z]/.test(password);
+        const numberOk = /[0-9]/.test(password);
+        const specialOk = /[^A-Za-z0-9]/.test(password);
+        return lengthOk && upperOk && lowerOk && numberOk && specialOk;
     }
 
     function validateName(name) {
@@ -245,10 +251,56 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     if (signupPasswordInput) {
+        const req = {
+            length: document.getElementById('req-length'),
+            upper: document.getElementById('req-upper'),
+            lower: document.getElementById('req-lower'),
+            number: document.getElementById('req-number'),
+            special: document.getElementById('req-special')
+        };
+        const strengthBar = document.getElementById('passwordStrengthBar');
+        const strengthLabel = document.getElementById('passwordStrengthLabel');
+        function updatePasswordChecklist(pw) {
+            const checks = {
+                length: pw.length >= 8,
+                upper: /[A-Z]/.test(pw),
+                lower: /[a-z]/.test(pw),
+                number: /[0-9]/.test(pw),
+                special: /[^A-Za-z0-9]/.test(pw)
+            };
+            Object.keys(checks).forEach(k => {
+                if (req[k]) {
+                    req[k].classList.remove('req-ok','req-bad','req-animate');
+                    req[k].classList.add('req-animate');
+                    if (checks[k]) req[k].classList.add('req-ok'); else req[k].classList.add('req-bad');
+                }
+            });
+
+            // Strength score: count satisfied requirements (0..5)
+            const score = Object.values(checks).filter(Boolean).length;
+            if (strengthBar && strengthLabel) {
+                let pct = (score / 5) * 100;
+                strengthBar.style.width = pct + '%';
+                if (score <= 2) {
+                    strengthBar.style.background = '#f44336';
+                    strengthLabel.textContent = 'Weak';
+                } else if (score === 3 || score === 4) {
+                    strengthBar.style.background = '#ff9800';
+                    strengthLabel.textContent = 'Medium';
+                } else {
+                    strengthBar.style.background = '#4caf50';
+                    strengthLabel.textContent = 'Strong';
+                }
+            }
+        }
+        signupPasswordInput.addEventListener('input', function() {
+            updatePasswordChecklist(this.value);
+        });
         signupPasswordInput.addEventListener('blur', function() {
             const password = this.value;
+            updatePasswordChecklist(password);
             if (password && !validatePassword(password)) {
-                showError(this, 'Password must be at least 6 characters long');
+                showError(this, 'Password must be at least 8 characters with upper, lower, number, and special');
             } else {
                 clearError(this);
             }
@@ -370,7 +422,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 showError(signupPasswordInput, 'Password is required');
                 isValid = false;
             } else if (!validatePassword(password)) {
-                showError(signupPasswordInput, 'Password must be at least 6 characters long');
+                showError(signupPasswordInput, 'Password must be at least 8 characters with upper, lower, number, and special');
                 isValid = false;
             }
             
@@ -383,6 +435,15 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             if (!isValid) return;
+
+            let recaptchaToken = '';
+            if (window.grecaptcha && grecaptcha.getResponse) {
+                recaptchaToken = grecaptcha.getResponse();
+                if (!recaptchaToken) {
+                    showToast('Please complete the reCAPTCHA', 'warning');
+                    return;
+                }
+            }
             
             // Show loading state
             const submitBtn = this.querySelector('.signin-btn');
@@ -524,7 +585,8 @@ document.addEventListener('DOMContentLoaded', function() {
                     username: username,
                     email: email,
                     password: password,
-                    confirm_password: password
+                    confirm_password: password,
+                    recaptcha_token: recaptchaToken
                 })
             });
 

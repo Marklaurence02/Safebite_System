@@ -1,4 +1,5 @@
 backend/config/gemini.php
+backend/config/recaptcha.php
 .env
 .env.*
 node_modules/

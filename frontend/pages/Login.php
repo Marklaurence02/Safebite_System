@@ -6,6 +6,7 @@
     <title>SafeBite - Authentication</title>
     <link rel="stylesheet" href="../assets/css/Login-assets/login.css">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
 </head>
 <body>
     <div class="App">
@@ -85,6 +86,23 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
                             </div>
+                            <!-- Password strength bar -->
+                            <div class="password-strength" style="margin-top:10px;">
+                                <div class="strength-label" id="passwordStrengthLabel">Weak</div>
+                                <div class="strength-track">
+                                    <div class="strength-bar" id="passwordStrengthBar"></div>
+                                </div>
+                            </div>
+                            <!-- Password requirements checklist -->
+                            <div id="passwordRequirements" style="margin-top:8px; font-size:0.9rem; color:#b0b0b0; line-height:1.4;">
+                                <ul style="list-style:none; padding-left:0; margin:0;">
+                                    <li id="req-length">• At least 8 characters</li>
+                                    <li id="req-upper">• One uppercase letter (A-Z)</li>
+                                    <li id="req-lower">• One lowercase letter (a-z)</li>
+                                    <li id="req-number">• One number (0-9)</li>
+                                    <li id="req-special">• One special character (!@#$%^&* etc.)</li>
+                                </ul>
+                            </div>
                         </div>
 
                         <div class="input-group">
@@ -98,6 +116,9 @@
                             </div>
                         </div>
 
+                        <div class="recaptcha-wrap" style="margin:10px 0; transform: scale(0.85); transform-origin: 0 0;">
+                            <div class="g-recaptcha" data-sitekey="6Le-aqwrAAAAAEXKtzu2pvOZjMT034GBPg_zkLNJ"></div>
+                        </div>
                         <button type="submit" class="signin-btn">
                             <span>Create Account</span>
                         </button>
