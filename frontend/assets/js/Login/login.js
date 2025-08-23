@@ -187,11 +187,11 @@ document.addEventListener('DOMContentLoaded', function() {
             const password = signupPasswordInput.value;
             const confirmPassword = confirmPasswordInput.value;
             if (!password || !validatePassword(password)) {
-                showError(signupPasswordInput, 'Password must be at least 8 characters with upper, lower, number, and special');
+                // showError(signupPasswordInput, 'Password must be at least 8 characters with upper, lower, number, and special');
                 ok = false;
             }
             if (!confirmPassword || password !== confirmPassword) {
-                showError(confirmPasswordInput, 'Passwords do not match');
+                // showError(confirmPasswordInput, 'Passwords do not match');
                 ok = false;
             }
         }
@@ -264,13 +264,14 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function validatePassword(password) {
-        // Strong password: min 8, upper, lower, number, special
-        const lengthOk = password.length >= 8;
-        const upperOk = /[A-Z]/.test(password);
-        const lowerOk = /[a-z]/.test(password);
-        const numberOk = /[0-9]/.test(password);
-        const specialOk = /[^A-Za-z0-9]/.test(password);
-        return lengthOk && upperOk && lowerOk && numberOk && specialOk;
+        // Temporarily relaxed password validation for debugging: min 6 characters
+        const lengthOk = password.length >= 6;
+        // const upperOk = /[A-Z]/.test(password);
+        // const lowerOk = /[a-z]/.test(password);
+        // const numberOk = /[0-9]/.test(password);
+        // const specialOk = /[^A-Za-z0-9]/.test(password);
+        // return lengthOk && upperOk && lowerOk && numberOk && specialOk;
+        return lengthOk;
     }
 
     function validateName(name) {
@@ -322,7 +323,7 @@ document.addEventListener('DOMContentLoaded', function() {
         passwordInput.addEventListener('blur', function() {
             const password = this.value;
             if (password && !validatePassword(password)) {
-                showError(this, 'Password must be at least 6 characters long');
+                // showError(this, 'Password must be at least 8 characters long, with uppercase, lowercase, numbers, and special characters.');
             } else {
                 clearError(this);
             }
@@ -413,7 +414,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const password = this.value;
             updatePasswordChecklist(password);
             if (password && !validatePassword(password)) {
-                showError(this, 'Password must be at least 8 characters with upper, lower, number, and special');
+                // showError(this, 'Password must be at least 8 characters with upper, lower, number, and special');
             } else {
                 clearError(this);
             }
@@ -425,7 +426,7 @@ document.addEventListener('DOMContentLoaded', function() {
             const password = signupPasswordInput.value;
             const confirmPassword = this.value;
             if (confirmPassword && password !== confirmPassword) {
-                showError(this, 'Passwords do not match');
+                // showError(this, 'Passwords do not match');
             } else {
                 clearError(this);
             }
@@ -468,12 +469,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 showError(passwordInput, 'Password is required');
                 isValid = false;
             } else if (!validatePassword(password)) {
-                showError(passwordInput, 'Password must be at least 6 characters long');
+                // showError(passwordInput, 'Password must be at least 6 characters long');
                 isValid = false;
             }
             
+            console.log('Validation Result (isValid):', isValid);
             if (!isValid) return;
             
+            console.log('Attempting to call performUserLogin...');
             // Show loading state
             const submitBtn = this.querySelector('.signin-btn');
             if (submitBtn) {
@@ -546,7 +549,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 showError(signupPasswordInput, 'Password is required');
                 isValid = false;
             } else if (!validatePassword(password)) {
-                showError(signupPasswordInput, 'Password must be at least 8 characters with upper, lower, number, and special');
+                // showError(signupPasswordInput, 'Password must be at least 8 characters with upper, lower, number, and special');
                 isValid = false;
             }
             
@@ -554,7 +557,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 showError(confirmPasswordInput, 'Please confirm your password');
                 isValid = false;
             } else if (password !== confirmPassword) {
-                showError(confirmPasswordInput, 'Passwords do not match');
+                // showError(confirmPasswordInput, 'Passwords do not match');
                 isValid = false;
             }
             
@@ -652,9 +655,12 @@ document.addEventListener('DOMContentLoaded', function() {
                 })
             });
 
+            console.log('API Response:', response);
+
             let data;
             try {
                 data = await response.json();
+                console.log('API Data:', data);
             } catch (jsonErr) {
                 data = { success: false, error: 'Invalid response from server. Check server logs.' };
                 console.error('JSON parsing error (User Login):', jsonErr, 'Response:', response.status, response.statusText);
@@ -674,6 +680,9 @@ document.addEventListener('DOMContentLoaded', function() {
             } else {
                 // Show backend error message if present
                 showToast(data.error || 'User login failed. Please try again.', 'error');
+                if (data.details) {
+                    console.error("Backend error details:", data.details);
+                }
             }
         } catch (error) {
             console.error('User Login fetch error:', error);
@@ -729,6 +738,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 2000);
             } else {
                 showToast(data.error || 'Registration failed. Please try again.', 'error');
+                if (data.details) {
+                    console.error("Backend error details:", data.details);
+                }
             }
         } catch (error) {
             console.error('User Signup error:', error);
@@ -776,6 +788,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }, 2000);
             } else {
                 showToast(data.error || 'Password reset failed. Please try again.', 'error');
+                if (data.details) {
+                    console.error("Backend error details:", data.details);
+                }
             }
         } catch (error) {
             console.error('User Password reset error:', error);
@@ -798,6 +813,7 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
 
+        console.log('Showing toast:', message, 'Type:', type);
         const toast = document.createElement('div');
         toast.className = `toast ${type}`;
         

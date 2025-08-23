@@ -35,14 +35,14 @@ $email = Auth::sanitizeInput($input['email']);
 $password = $input['password'];
 
 // Validate email format
-if (!Auth::validateEmail($email)) {
-    Auth::sendResponse(['error' => 'Invalid email format'], 400);
-}
+// if (!Auth::validateEmail($email)) {
+//     Auth::sendResponse(['error' => 'Invalid email format'], 400);
+// }
 
 // Validate password length
-if (strlen($password) < 6) {
-    Auth::sendResponse(['error' => 'Password must be at least 6 characters'], 400);
-}
+// if (strlen($password) < 6) {
+//     Auth::sendResponse(['error' => 'Password must be at least 6 characters'], 400);
+// }
 
 try {
     // Connect to database
@@ -56,7 +56,7 @@ try {
     // Check if user exists
     $query = "SELECT user_id, first_name, last_name, username, email, password_hash, role, account_status 
               FROM users 
-              WHERE email = ? AND account_status = 'active' AND role = 'User'";
+              WHERE email = ? AND account_status = 'active'";
     
     $stmt = $db->prepare($query);
     $stmt->execute([$email]);
@@ -106,6 +106,6 @@ try {
     
 } catch (Exception $e) {
     error_log("Login error: " . $e->getMessage());
-    Auth::sendResponse(['error' => 'Internal server error'], 500);
+    Auth::sendResponse(['error' => 'Internal server error', 'details' => $e->getMessage()], 500);
 }
 ?> 
